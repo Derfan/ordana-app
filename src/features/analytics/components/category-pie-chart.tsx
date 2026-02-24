@@ -1,10 +1,9 @@
-import { Dimensions, StyleSheet, View } from 'react-native';
-import { PieChart } from 'react-native-chart-kit';
+import { StyleSheet, View } from 'react-native';
+import { PieChart } from 'react-native-gifted-charts';
 
 import { ThemedText } from '@components/themed-text';
 import { ThemedView } from '@components/themed-view';
 import type { CategorySpending } from '@db/repositories';
-import { useColorScheme } from '@hooks/use-color-scheme';
 import { formatCurrency } from '@utils/currency';
 
 interface CategoryPieChartProps {
@@ -13,9 +12,6 @@ interface CategoryPieChartProps {
 }
 
 export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
-
   if (data.length === 0) {
     return (
       <ThemedView style={styles.emptyContainer}>
@@ -26,15 +22,10 @@ export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
   }
 
   const chartData = data.map((item) => ({
-    name: item.categoryName,
-    amount: item.totalAmount / 100, // Convert from cents to major units
+    value: item.totalAmount,
     color: item.categoryColor,
-    legendFontColor: isDark ? '#fff' : '#000',
-    legendFontSize: 12,
+    text: `${(item.percentage * 100).toFixed(1)}%`,
   }));
-
-  const screenWidth = Dimensions.get('window').width;
-  const chartWidth = screenWidth - 40; // padding
 
   return (
     <ThemedView style={styles.container}>
@@ -42,18 +33,16 @@ export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
         {title}
       </ThemedText>
 
-      <PieChart
-        data={chartData}
-        width={chartWidth}
-        height={220}
-        chartConfig={{
-          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-        }}
-        accessor="amount"
-        backgroundColor="transparent"
-        paddingLeft="15"
-        absolute
-      />
+      <View style={styles.chartContainer}>
+        <PieChart
+          data={chartData}
+          radius={100}
+          showText
+          textColor="white"
+          textSize={12}
+          focusOnPress
+        />
+      </View>
 
       <View style={styles.legend}>
         {data.map((item) => (
@@ -86,6 +75,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 16,
     textAlign: 'center',
+  },
+  chartContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 16,
   },
   legend: {
     marginTop: 16,

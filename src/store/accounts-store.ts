@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import type { Account, NewAccount } from '@db/repositories/account-repository';
-import { accountService } from '@features/accounts';
+import { accountService } from '@features/accounts/services/account.service';
 
 interface AccountsState {
   // State

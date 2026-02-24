@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 import type { Category, CategoryType, NewCategory } from '@db/repositories';
-import { categoryService } from '@features/categories';
+import { categoryService } from '@features/categories/services/category.service';
 
 interface CategoriesState {
   // State
