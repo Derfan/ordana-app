@@ -1,1 +1,1 @@
-export { CategoryPieChart } from './category-pie-chart';
+export { CategoryPieChart } from "./category-pie-chart";

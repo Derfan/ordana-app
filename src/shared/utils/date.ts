@@ -1,27 +1,27 @@
 export function dateToTimestamp(date: Date): number {
-  return Math.floor(date.getTime() / 1000);
+    return Math.floor(date.getTime() / 1000);
 }
 
 export function timestampToDate(timestamp: number): Date {
-  return new Date(timestamp * 1000);
+    return new Date(timestamp * 1000);
 }
 
 export function formatDate(date: Date): string {
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+    return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
 }
 
 export function formatDateTime(date: Date): string {
-  return date.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+    return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    });
 }
 
 export function startOfDay(date: Date = new Date()): Date {

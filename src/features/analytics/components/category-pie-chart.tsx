@@ -4,173 +4,176 @@ import { PieChart } from "react-native-gifted-charts";
 import { ThemedText } from "@components/themed-text";
 import { ThemedView } from "@components/themed-view";
 import type { CategorySpending } from "@db/repositories";
-import { formatCurrency } from "@utils/currency";
+import { formatCurrency } from "@shared/utils/currency";
 
 const useChartData = (data: CategorySpending[]) => {
-  return data.map((item, idx) => ({
-    color: item.categoryColor,
-    value: item.totalAmount,
-    label: item.categoryName,
-    percentage: `${(item.percentage * 100).toFixed(1)}%`,
-    focused: idx === 0,
-  }));
+    return data.map((item, idx) => ({
+        color: item.categoryColor,
+        value: item.totalAmount,
+        label: item.categoryName,
+        percentage: `${(item.percentage * 100).toFixed(1)}%`,
+        focused: idx === 0,
+    }));
 };
 
 interface CategoryPieChartProps {
-  data: CategorySpending[];
-  title: string;
+    data: CategorySpending[];
+    title: string;
 }
 
 export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
-  const chartData = useChartData(data);
+    const chartData = useChartData(data);
 
-  if (data.length === 0) {
-    return (
-      <ThemedView style={styles.emptyContainer}>
-        <ThemedText style={styles.emptyIcon}>📊</ThemedText>
-        <ThemedText style={styles.emptyText}>
-          No data for this period
-        </ThemedText>
-      </ThemedView>
-    );
-  }
-
-  return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="subtitle" style={styles.title}>
-        {title}
-      </ThemedText>
-
-      <View style={styles.chartContainer}>
-        <PieChart
-          data={chartData}
-          radius={90}
-          innerRadius={60}
-          textColor="white"
-          textSize={12}
-          centerLabelComponent={(activeIdx: number) => {
-            const { label, percentage } = chartData[activeIdx] ?? {};
-
-            return (
-              <ThemedView style={styles.centerLabel}>
-                <ThemedText style={styles.centerLabelPercentage}>
-                  {percentage}
+    if (data.length === 0) {
+        return (
+            <ThemedView style={styles.emptyContainer}>
+                <ThemedText style={styles.emptyIcon}>📊</ThemedText>
+                <ThemedText style={styles.emptyText}>
+                    No data for this period
                 </ThemedText>
-                <ThemedText>{label}</ThemedText>
-              </ThemedView>
-            );
-          }}
-          focusOnPress
-          donut
-        />
-      </View>
+            </ThemedView>
+        );
+    }
 
-      <View style={styles.legend}>
-        {data.map((item) => (
-          <View key={item.categoryId} style={styles.legendItem}>
-            <View style={styles.legendLeft}>
-              <View
-                style={[
-                  styles.colorDot,
-                  { backgroundColor: item.categoryColor },
-                ]}
-              />
-              <ThemedText style={styles.categoryIcon}>
-                {item.categoryIcon}
-              </ThemedText>
-              <ThemedText style={styles.categoryName}>
-                {item.categoryName}
-              </ThemedText>
+    return (
+        <ThemedView style={styles.container}>
+            <ThemedText type="subtitle" style={styles.title}>
+                {title}
+            </ThemedText>
+
+            <View style={styles.chartContainer}>
+                <PieChart
+                    data={chartData}
+                    radius={90}
+                    innerRadius={60}
+                    textColor="white"
+                    textSize={12}
+                    centerLabelComponent={(activeIdx: number) => {
+                        const { label, percentage } =
+                            chartData[activeIdx] ?? {};
+
+                        return (
+                            <ThemedView style={styles.centerLabel}>
+                                <ThemedText
+                                    style={styles.centerLabelPercentage}
+                                >
+                                    {percentage}
+                                </ThemedText>
+                                <ThemedText>{label}</ThemedText>
+                            </ThemedView>
+                        );
+                    }}
+                    focusOnPress
+                    donut
+                />
             </View>
-            <View style={styles.legendRight}>
-              <ThemedText style={styles.amount}>
-                {formatCurrency(item.totalAmount)}
-              </ThemedText>
-              <ThemedText style={styles.percentage}>
-                {(item.percentage * 100).toFixed(1)}%
-              </ThemedText>
+
+            <View style={styles.legend}>
+                {data.map((item) => (
+                    <View key={item.categoryId} style={styles.legendItem}>
+                        <View style={styles.legendLeft}>
+                            <View
+                                style={[
+                                    styles.colorDot,
+                                    { backgroundColor: item.categoryColor },
+                                ]}
+                            />
+                            <ThemedText style={styles.categoryIcon}>
+                                {item.categoryIcon}
+                            </ThemedText>
+                            <ThemedText style={styles.categoryName}>
+                                {item.categoryName}
+                            </ThemedText>
+                        </View>
+                        <View style={styles.legendRight}>
+                            <ThemedText style={styles.amount}>
+                                {formatCurrency(item.totalAmount)}
+                            </ThemedText>
+                            <ThemedText style={styles.percentage}>
+                                {(item.percentage * 100).toFixed(1)}%
+                            </ThemedText>
+                        </View>
+                    </View>
+                ))}
             </View>
-          </View>
-        ))}
-      </View>
-    </ThemedView>
-  );
+        </ThemedView>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: "rgba(0, 0, 0, 0.02)",
-  },
-  title: {
-    fontSize: 18,
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  chartContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 16,
-  },
-  centerLabel: {
-    alignItems: "center",
-    gap: 8,
-  },
-  centerLabelPercentage: {
-    fontSize: 20,
-    fontWeight: "600",
-  },
-  legend: {
-    marginTop: 16,
-    gap: 12,
-  },
-  legendItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  legendLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    flex: 1,
-  },
-  colorDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  categoryIcon: {
-    fontSize: 18,
-  },
-  categoryName: {
-    fontSize: 14,
-    flex: 1,
-  },
-  legendRight: {
-    alignItems: "flex-end",
-    gap: 2,
-  },
-  amount: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  percentage: {
-    fontSize: 12,
-    opacity: 0.6,
-  },
-  emptyContainer: {
-    padding: 40,
-    alignItems: "center",
-  },
-  emptyIcon: {
-    fontSize: 60,
-    marginBottom: 12,
-  },
-  emptyText: {
-    fontSize: 14,
-    opacity: 0.6,
-  },
+    container: {
+        padding: 16,
+        borderRadius: 12,
+        backgroundColor: "rgba(0, 0, 0, 0.02)",
+    },
+    title: {
+        fontSize: 18,
+        marginBottom: 16,
+        textAlign: "center",
+    },
+    chartContainer: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginVertical: 16,
+    },
+    centerLabel: {
+        alignItems: "center",
+        gap: 8,
+    },
+    centerLabelPercentage: {
+        fontSize: 20,
+        fontWeight: "600",
+    },
+    legend: {
+        marginTop: 16,
+        gap: 12,
+    },
+    legendItem: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingVertical: 8,
+    },
+    legendLeft: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 8,
+        flex: 1,
+    },
+    colorDot: {
+        width: 12,
+        height: 12,
+        borderRadius: 6,
+    },
+    categoryIcon: {
+        fontSize: 18,
+    },
+    categoryName: {
+        fontSize: 14,
+        flex: 1,
+    },
+    legendRight: {
+        alignItems: "flex-end",
+        gap: 2,
+    },
+    amount: {
+        fontSize: 14,
+        fontWeight: "600",
+    },
+    percentage: {
+        fontSize: 12,
+        opacity: 0.6,
+    },
+    emptyContainer: {
+        padding: 40,
+        alignItems: "center",
+    },
+    emptyIcon: {
+        fontSize: 60,
+        marginBottom: 12,
+    },
+    emptyText: {
+        fontSize: 14,
+        opacity: 0.6,
+    },
 });

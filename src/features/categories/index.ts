@@ -1,3 +1,2 @@
-export * from './components';
-export * from './services/category.service';
-
+export * from "./components";
+export * from "./services/category.service";
