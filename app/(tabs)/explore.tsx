@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
     ActivityIndicator,
     RefreshControl,
@@ -9,20 +10,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ThemedText } from "@components/themed-text";
 import { ThemedView } from "@components/themed-view";
-import { CategoryPieChart } from "@features/analytics";
-import { useCurrentMonthAnalytics } from "@hooks/use-analytics";
+import { CategoryPieChart, MonthPicker } from "@features/analytics";
+import { useMonthAnalytics } from "@hooks/use-analytics";
 import { useThemeColor } from "@hooks/use-theme-color";
 import { formatCurrency } from "@shared/utils/currency";
 
 export default function AnalyticsScreen() {
     const backgroundColor = useThemeColor({}, "background");
 
-    const { data, isLoading, error, refresh } = useCurrentMonthAnalytics();
+    const now = new Date();
+    const [year, setYear] = useState(now.getUTCFullYear());
+    const [month, setMonth] = useState(now.getUTCMonth());
 
-    const currentMonth = new Date().toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-    });
+    const { data, isLoading, error, refresh } = useMonthAnalytics(year, month);
+
+    const handleMonthChange = (nextYear: number, nextMonth: number) => {
+        setYear(nextYear);
+        setMonth(nextMonth);
+    };
 
     if (error) {
         return (
@@ -30,17 +35,6 @@ export default function AnalyticsScreen() {
                 <ThemedText style={styles.errorText}>❌ {error}</ThemedText>
                 <ThemedText onPress={refresh} style={styles.retryText}>
                     Retry
-                </ThemedText>
-            </ThemedView>
-        );
-    }
-
-    if (isLoading || !data) {
-        return (
-            <ThemedView style={styles.centerContainer}>
-                <ActivityIndicator size="large" color="#0a7ea4" />
-                <ThemedText style={styles.loadingText}>
-                    Loading analytics...
                 </ThemedText>
             </ThemedView>
         );
@@ -55,68 +49,101 @@ export default function AnalyticsScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
-                    <RefreshControl refreshing={false} onRefresh={refresh} />
+                    <RefreshControl
+                        refreshing={isLoading}
+                        onRefresh={refresh}
+                    />
                 }
             >
                 <View style={styles.header}>
                     <ThemedText type="title">Analytics</ThemedText>
-                    <ThemedText style={styles.monthText}>
-                        {currentMonth}
-                    </ThemedText>
                 </View>
 
-                <View style={styles.statsContainer}>
-                    <View style={[styles.statCard, styles.incomeCard]}>
-                        <ThemedText style={styles.statLabel}>Income</ThemedText>
-                        <ThemedText style={styles.statAmount}>
-                            {formatCurrency(data.stats.totalIncome)}
+                <MonthPicker
+                    year={year}
+                    month={month}
+                    onChange={handleMonthChange}
+                    maxDate={now}
+                />
+
+                {isLoading || !data ? (
+                    <View style={styles.centerContainer}>
+                        <ActivityIndicator size="large" color="#0a7ea4" />
+                        <ThemedText style={styles.loadingText}>
+                            Loading analytics...
                         </ThemedText>
                     </View>
+                ) : (
+                    <>
+                        <View style={styles.statsContainer}>
+                            <View style={[styles.statCard, styles.incomeCard]}>
+                                <ThemedText style={styles.statLabel}>
+                                    Income
+                                </ThemedText>
+                                <ThemedText style={styles.statAmount}>
+                                    {formatCurrency(data.stats.totalIncome)}
+                                </ThemedText>
+                            </View>
 
-                    <View style={[styles.statCard, styles.expenseCard]}>
-                        <ThemedText style={styles.statLabel}>
-                            Expenses
-                        </ThemedText>
-                        <ThemedText style={styles.statAmount}>
-                            {formatCurrency(data.stats.totalExpense)}
-                        </ThemedText>
-                    </View>
-                </View>
+                            <View style={[styles.statCard, styles.expenseCard]}>
+                                <ThemedText style={styles.statLabel}>
+                                    Expenses
+                                </ThemedText>
+                                <ThemedText style={styles.statAmount}>
+                                    {formatCurrency(data.stats.totalExpense)}
+                                </ThemedText>
+                            </View>
+                        </View>
 
-                <View style={[styles.statCard, styles.balanceCard]}>
-                    <ThemedText style={styles.statLabel}>
-                        Net Balance
-                    </ThemedText>
-                    <ThemedText
-                        style={[
-                            styles.statAmount,
-                            styles.balanceLarge,
-                            data.stats.balance < 0 && styles.balanceNegative,
-                        ]}
-                    >
-                        {formatCurrency(data.stats.balance)}
-                    </ThemedText>
-                    <ThemedText style={styles.transactionCount}>
-                        {data.stats.transactionCount} transactions
-                    </ThemedText>
-                </View>
+                        <View style={[styles.statCard, styles.balanceCard]}>
+                            <ThemedText style={styles.statLabel}>
+                                Net Balance
+                            </ThemedText>
+                            <ThemedText
+                                style={[
+                                    styles.statAmount,
+                                    styles.balanceLarge,
+                                    data.stats.balance < 0 &&
+                                        styles.balanceNegative,
+                                ]}
+                            >
+                                {formatCurrency(data.stats.balance)}
+                            </ThemedText>
+                            <ThemedText style={styles.transactionCount}>
+                                {data.stats.transactionCount} transactions
+                            </ThemedText>
+                        </View>
 
-                {data.expensesByCategory.length > 0 && (
-                    <View style={styles.chartSection}>
-                        <CategoryPieChart
-                            data={data.expensesByCategory}
-                            title="Expenses by Category"
-                        />
-                    </View>
-                )}
+                        {data.expensesByCategory.length > 0 ? (
+                            <View style={styles.chartSection}>
+                                <CategoryPieChart
+                                    data={data.expensesByCategory}
+                                    title="Expenses by Category"
+                                />
+                            </View>
+                        ) : null}
 
-                {data.incomeByCategory.length > 0 && (
-                    <View style={styles.chartSection}>
-                        <CategoryPieChart
-                            data={data.incomeByCategory}
-                            title="Income by Category"
-                        />
-                    </View>
+                        {data.incomeByCategory.length > 0 ? (
+                            <View style={styles.chartSection}>
+                                <CategoryPieChart
+                                    data={data.incomeByCategory}
+                                    title="Income by Category"
+                                />
+                            </View>
+                        ) : null}
+
+                        {data.expensesByCategory.length === 0 &&
+                            data.incomeByCategory.length === 0 && (
+                                <View style={styles.emptyState}>
+                                    <ThemedText style={styles.emptyIcon}>
+                                        📊
+                                    </ThemedText>
+                                    <ThemedText style={styles.emptyText}>
+                                        No transactions for this month
+                                    </ThemedText>
+                                </View>
+                            )}
+                    </>
                 )}
             </ScrollView>
         </SafeAreaView>
@@ -135,7 +162,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        padding: 20,
+        paddingVertical: 48,
     },
     loadingText: {
         marginTop: 12,
@@ -152,17 +179,13 @@ const styles = StyleSheet.create({
         fontWeight: "600",
     },
     header: {
-        marginBottom: 20,
-    },
-    monthText: {
-        fontSize: 14,
-        opacity: 0.6,
-        marginTop: 4,
+        marginBottom: 8,
     },
     statsContainer: {
         flexDirection: "row",
         gap: 12,
         marginBottom: 12,
+        marginTop: 20,
     },
     statCard: {
         flex: 1,
@@ -205,5 +228,18 @@ const styles = StyleSheet.create({
     },
     chartSection: {
         marginBottom: 24,
+    },
+    emptyState: {
+        alignItems: "center",
+        paddingVertical: 48,
+    },
+    emptyIcon: {
+        fontSize: 60,
+        marginBottom: 12,
+        lineHeight: 72,
+    },
+    emptyText: {
+        fontSize: 14,
+        opacity: 0.6,
     },
 });

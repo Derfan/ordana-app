@@ -1,28 +1,32 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { AnalyticsData } from "@features/analytics";
 import { analyticsService } from "@features/analytics";
 import { useAppStateActive } from "@hooks/use-app-state";
-import { useTransactionsStore } from "@store/transactions-store";
 
-/**
- * Hook for current month analytics
- */
-export function useCurrentMonthAnalytics() {
+export interface UseMonthAnalyticsResult {
+    data: AnalyticsData | null;
+    isLoading: boolean;
+    error: string | null;
+    refresh: () => void;
+}
+
+export function useMonthAnalytics(
+    year: number,
+    month: number,
+): UseMonthAnalyticsResult {
     const [data, setData] = useState<AnalyticsData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Subscribe to transactions count to know when to reload
-    const transactionsCount = useTransactionsStore(
-        (state) => state.transactions.length,
-    );
-
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
-            const analytics = await analyticsService.getCurrentMonthAnalytics();
+            const analytics = await analyticsService.getMonthAnalytics(
+                year,
+                month,
+            );
             setData(analytics);
         } catch (err) {
             setError(
@@ -31,20 +35,22 @@ export function useCurrentMonthAnalytics() {
         } finally {
             setIsLoading(false);
         }
-    };
-
-    useAppStateActive(() => {
-        loadData();
-    });
+    }, [year, month]);
 
     useEffect(() => {
         loadData();
-    }, [transactionsCount]);
+    }, [loadData]);
 
-    return {
-        data,
-        isLoading,
-        error,
-        refresh: loadData,
-    };
+    useAppStateActive(loadData);
+
+    return { data, isLoading, error, refresh: loadData };
+}
+
+/**
+ * Convenience wrapper that defaults to the current UTC month.
+ * Used on the Home screen summary cards.
+ */
+export function useCurrentMonthAnalytics(): UseMonthAnalyticsResult {
+    const now = new Date();
+    return useMonthAnalytics(now.getUTCFullYear(), now.getUTCMonth());
 }
