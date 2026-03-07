@@ -4,6 +4,7 @@ import { PieChart } from "react-native-gifted-charts";
 import { ThemedText } from "@components/themed-text";
 import { ThemedView } from "@components/themed-view";
 import type { CategorySpending } from "@db/repositories";
+import { useThemeColor } from "@hooks/use-theme-color";
 import { formatCurrency } from "@shared/utils/currency";
 
 const useChartData = (data: CategorySpending[]) => {
@@ -23,6 +24,7 @@ interface CategoryPieChartProps {
 
 export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
     const chartData = useChartData(data);
+    const surfaceColor = useThemeColor({}, "background");
 
     if (data.length === 0) {
         return (
@@ -46,8 +48,7 @@ export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
                     data={chartData}
                     radius={90}
                     innerRadius={60}
-                    textColor="white"
-                    textSize={12}
+                    innerCircleColor={surfaceColor}
                     centerLabelComponent={(activeIdx: number) => {
                         const { label, percentage } =
                             chartData[activeIdx] ?? {};
@@ -64,7 +65,6 @@ export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
                         );
                     }}
                     focusOnPress
-                    donut
                 />
             </View>
 
