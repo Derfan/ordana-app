@@ -75,7 +75,7 @@
 ### Prerequisites
 
 - **Node.js** (v20 or higher)
-- **npm** or **yarn**
+- **pnpm**
 - **Expo CLI** (optional, but recommended)
 - **iOS Simulator** (macOS) or **Android Emulator**
 
@@ -89,12 +89,12 @@
 
 2. **Install dependencies**
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Start the development server**
    ```bash
-   npm start
+   pnpm start
    ```
 
 4. **Run on your preferred platform**
@@ -159,8 +159,8 @@ ordana-app/
 ### **Migrations**
 Managed by Drizzle Kit:
 ```bash
-npm run db:generate  # Generate migration files
-npm run db:studio    # Open Drizzle Studio
+pnpm run db:generate  # Generate migration files
+pnpm run db:studio    # Open Drizzle Studio
 ```
 
 ---
@@ -169,14 +169,14 @@ npm run db:studio    # Open Drizzle Studio
 
 | Command | Description |
 |---------|-------------|
-| `npm start` | Start Expo development server |
-| `npm run android` | Run on Android emulator |
-| `npm run ios` | Run on iOS simulator |
-| `npm run web` | Run in web browser |
-| `npm run lint` | Run ESLint |
-| `npm run db:generate` | Generate database migrations |
-| `npm run db:studio` | Open Drizzle Studio UI |
-| `npm run db:check` | Check migration consistency |
+| `pnpm start` | Start Expo development server |
+| `pnpm run android` | Run on Android emulator |
+| `pnpm run ios` | Run on iOS simulator |
+| `pnpm run web` | Run in web browser |
+| `pnpm run lint` | Run ESLint |
+| `pnpm run db:generate` | Generate database migrations |
+| `pnpm run db:studio` | Open Drizzle Studio UI |
+| `pnpm run db:check` | Check migration consistency |
 
 ---
 
