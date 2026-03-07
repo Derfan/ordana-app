@@ -1,18 +1,11 @@
-import { StyleSheet } from "react-native";
+import { View } from "@shared/design-system";
 
-import { ThemedView } from "@components/themed-view";
 import { AccountsList } from "@features/accounts";
 
 export default function AccountsScreen() {
     return (
-        <ThemedView style={styles.container}>
+        <View surface="primary" style={{ flex: 1 }}>
             <AccountsList />
-        </ThemedView>
+        </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-});

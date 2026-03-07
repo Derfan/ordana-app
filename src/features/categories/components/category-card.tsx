@@ -1,7 +1,6 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
+import { Text, View, createThemedStyles } from "@shared/design-system";
 import type { Category } from "@db/repositories";
 
 interface CategoryCardProps {
@@ -17,6 +16,8 @@ export function CategoryCard({
     onDelete,
     showType = false,
 }: CategoryCardProps) {
+    const styles = useStyles();
+
     const typeLabel = category.type === "income" ? "Income" : "Expense";
 
     return (
@@ -28,22 +29,18 @@ export function CategoryCard({
             ]}
             disabled={!onPress}
         >
-            <ThemedView
-                style={[styles.content, { borderLeftColor: category.color }]}
-            >
-                <View style={styles.iconContainer}>
-                    <ThemedText style={styles.icon}>{category.icon}</ThemedText>
+            <View style={[styles.content, { borderLeftColor: category.color }]}>
+                <View colorValue="transparent" style={styles.iconContainer}>
+                    <Text style={styles.iconText}>{category.icon}</Text>
                 </View>
 
-                <View style={styles.info}>
-                    <ThemedText type="defaultSemiBold" style={styles.name}>
-                        {category.name}
-                    </ThemedText>
+                <View colorValue="transparent" style={styles.info}>
+                    <Text variant="bodySemibold">{category.name}</Text>
                     {showType && (
-                        <ThemedText style={styles.type}>
+                        <Text variant="caption" color="muted">
                             {typeLabel}
                             {category.isSystem && " • System"}
-                        </ThemedText>
+                        </Text>
                     )}
                 </View>
 
@@ -55,71 +52,66 @@ export function CategoryCard({
                             pressed && styles.deleteButtonPressed,
                         ]}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Delete ${category.name}`}
                     >
-                        <ThemedText style={styles.deleteText}>✕</ThemedText>
+                        <Text variant="labelSmall" colorValue="#fff">
+                            ✕
+                        </Text>
                     </Pressable>
                 )}
-            </ThemedView>
+            </View>
         </Pressable>
     );
 }
 
-const styles = StyleSheet.create({
-    card: {
-        borderRadius: 12,
-        overflow: "hidden",
-        marginBottom: 8,
-    },
-    cardPressed: {
-        opacity: 0.7,
-    },
-    content: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 12,
-        backgroundColor: "rgba(0, 0, 0, 0.02)",
-        borderRadius: 12,
-        borderLeftWidth: 4,
-    },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: "rgba(0, 0, 0, 0.05)",
-        alignItems: "center",
-        justifyContent: "center",
-        marginRight: 12,
-    },
-    icon: {
-        fontSize: 20,
-    },
-    info: {
-        flex: 1,
-        gap: 2,
-    },
-    name: {
-        fontSize: 16,
-    },
-    type: {
-        fontSize: 12,
-        color: "#6b7280",
-    },
-    deleteButton: {
-        width: 28,
-        height: 28,
-        borderRadius: 14,
-        backgroundColor: "#dc2626",
-        alignItems: "center",
-        justifyContent: "center",
-        marginLeft: 8,
-    },
-    deleteButtonPressed: {
-        opacity: 0.7,
-        transform: [{ scale: 0.95 }],
-    },
-    deleteText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        card: {
+            borderRadius: theme.radii.md,
+            overflow: "hidden",
+            marginBottom: theme.spacing[2],
+        },
+        cardPressed: {
+            opacity: 0.7,
+        },
+        content: {
+            flexDirection: "row",
+            alignItems: "center",
+            padding: theme.spacing[3],
+            backgroundColor: theme.colors.surface.subtle,
+            borderRadius: theme.radii.md,
+            borderLeftWidth: 4,
+        },
+        iconContainer: {
+            width: 40,
+            height: 40,
+            borderRadius: theme.radii.circle,
+            backgroundColor: theme.colors.surface.muted,
+            alignItems: "center",
+            justifyContent: "center",
+            marginRight: theme.spacing[3],
+        },
+        iconText: {
+            fontSize: 20,
+            lineHeight: 24,
+        },
+        info: {
+            flex: 1,
+            gap: theme.spacing[0.5],
+        },
+        deleteButton: {
+            width: 28,
+            height: 28,
+            borderRadius: theme.radii.circle,
+            backgroundColor: theme.colors.status.danger,
+            alignItems: "center",
+            justifyContent: "center",
+            marginLeft: theme.spacing[2],
+        },
+        deleteButtonPressed: {
+            opacity: 0.7,
+            transform: [{ scale: 0.95 }],
+        },
+    }),
+);

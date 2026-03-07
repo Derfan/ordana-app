@@ -5,11 +5,17 @@ import {
     ScrollView,
     StyleSheet,
     TextInput,
-    View,
 } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { BaseModal, modalFormStyles } from "@components/ui/base-modal";
+import { BaseModal } from "@components/ui/base-modal";
+import {
+    Button,
+    Text,
+    View,
+    createThemedStyles,
+    useModalFormStyles,
+    useTheme,
+} from "@shared/design-system";
 import type { CategoryType, NewTransaction } from "@db/repositories";
 import { useAccounts } from "@hooks/use-accounts";
 import { useCategories } from "@hooks/use-categories";
@@ -39,6 +45,10 @@ export function AddTransactionModal({
     const [date, setDate] = useState(new Date());
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const styles = useStyles();
+    const formStyles = useModalFormStyles();
+    const theme = useTheme();
+
     const { accounts } = useAccounts();
     const { incomeCategories, expenseCategories } = useCategories();
 
@@ -63,7 +73,6 @@ export function AddTransactionModal({
 
     const handleTypeChange = (newType: CategoryType) => {
         setType(newType);
-        // Reset category selection when type changes
         setSelectedCategoryId(null);
     };
 
@@ -87,7 +96,6 @@ export function AddTransactionModal({
 
         setIsSubmitting(true);
         try {
-            // Convert amount to cents (integer)
             const amountInCents = Math.round(numAmount * 100);
 
             await onSubmit({
@@ -101,11 +109,11 @@ export function AddTransactionModal({
 
             resetForm();
             onClose();
-        } catch (error) {
+        } catch (err) {
             Alert.alert(
                 "Error",
-                error instanceof Error
-                    ? error.message
+                err instanceof Error
+                    ? err.message
                     : "Failed to create transaction",
             );
         } finally {
@@ -120,88 +128,92 @@ export function AddTransactionModal({
             onClose={handleClose}
             isSubmitting={isSubmitting}
         >
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Type */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Type
-                </ThemedText>
-                <View style={modalFormStyles.typeButtons}>
+                </Text>
+                <View colorValue="transparent" style={formStyles.typeButtons}>
                     <Pressable
                         onPress={() => handleTypeChange("expense")}
                         style={[
-                            modalFormStyles.typeButton,
+                            formStyles.typeButton,
                             type === "expense" &&
-                                modalFormStyles.typeButtonActiveExpense,
+                                formStyles.typeButtonActiveExpense,
                         ]}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: type === "expense" }}
                     >
-                        <ThemedText
+                        <Text
                             style={[
-                                modalFormStyles.typeButtonText,
+                                formStyles.typeButtonText,
                                 type === "expense" &&
-                                    modalFormStyles.typeButtonTextActive,
+                                    formStyles.typeButtonTextActive,
                             ]}
                         >
                             Expense
-                        </ThemedText>
+                        </Text>
                     </Pressable>
 
                     <Pressable
                         onPress={() => handleTypeChange("income")}
                         style={[
-                            modalFormStyles.typeButton,
+                            formStyles.typeButton,
                             type === "income" &&
-                                modalFormStyles.typeButtonActiveIncome,
+                                formStyles.typeButtonActiveIncome,
                         ]}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected: type === "income" }}
                     >
-                        <ThemedText
+                        <Text
                             style={[
-                                modalFormStyles.typeButtonText,
+                                formStyles.typeButtonText,
                                 type === "income" &&
-                                    modalFormStyles.typeButtonTextActive,
+                                    formStyles.typeButtonTextActive,
                             ]}
                         >
                             Income
-                        </ThemedText>
+                        </Text>
                     </Pressable>
                 </View>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Amount */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Amount *
-                </ThemedText>
-                <View style={styles.amountInputContainer}>
-                    <ThemedText style={styles.currencySymbol}>€</ThemedText>
+                </Text>
+                <View
+                    colorValue="transparent"
+                    style={styles.amountInputContainer}
+                >
+                    <Text style={styles.currencySymbol}>€</Text>
                     <TextInput
                         style={styles.amountInput}
                         value={amount}
                         onChangeText={setAmount}
                         placeholder="0.00"
-                        placeholderTextColor="#999"
+                        placeholderTextColor={theme.colors.text.placeholder}
                         keyboardType="decimal-pad"
                         editable={!isSubmitting}
                     />
                 </View>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Account */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Account *
-                </ThemedText>
+                </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <View style={styles.optionsContainer}>
+                    <View
+                        colorValue="transparent"
+                        style={styles.optionsContainer}
+                    >
                         {accounts.length === 0 ? (
-                            <ThemedText style={modalFormStyles.emptyText}>
+                            <Text style={formStyles.emptyText}>
                                 No accounts available
-                            </ThemedText>
+                            </Text>
                         ) : (
                             accounts.map((account) => (
                                 <Pressable
@@ -214,8 +226,13 @@ export function AddTransactionModal({
                                         selectedAccountId === account.id &&
                                             styles.optionButtonActive,
                                     ]}
+                                    accessibilityRole="button"
+                                    accessibilityState={{
+                                        selected:
+                                            selectedAccountId === account.id,
+                                    }}
                                 >
-                                    <ThemedText
+                                    <Text
                                         style={[
                                             styles.optionText,
                                             selectedAccountId === account.id &&
@@ -223,7 +240,7 @@ export function AddTransactionModal({
                                         ]}
                                     >
                                         {account.name}
-                                    </ThemedText>
+                                    </Text>
                                 </Pressable>
                             ))
                         )}
@@ -231,19 +248,20 @@ export function AddTransactionModal({
                 </ScrollView>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Category */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Category *
-                </ThemedText>
+                </Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <View style={styles.optionsContainer}>
+                    <View
+                        colorValue="transparent"
+                        style={styles.optionsContainer}
+                    >
                         {currentCategories.length === 0 ? (
-                            <ThemedText style={modalFormStyles.emptyText}>
+                            <Text style={formStyles.emptyText}>
                                 No categories available
-                            </ThemedText>
+                            </Text>
                         ) : (
                             currentCategories.map((category) => (
                                 <Pressable
@@ -258,11 +276,16 @@ export function AddTransactionModal({
                                             borderColor: category.color,
                                         },
                                     ]}
+                                    accessibilityRole="button"
+                                    accessibilityState={{
+                                        selected:
+                                            selectedCategoryId === category.id,
+                                    }}
                                 >
-                                    <ThemedText style={styles.categoryIcon}>
+                                    <Text style={styles.categoryIcon}>
                                         {category.icon}
-                                    </ThemedText>
-                                    <ThemedText
+                                    </Text>
+                                    <Text
                                         style={[
                                             styles.categoryText,
                                             selectedCategoryId ===
@@ -272,7 +295,7 @@ export function AddTransactionModal({
                                         numberOfLines={1}
                                     >
                                         {category.name}
-                                    </ThemedText>
+                                    </Text>
                                 </Pressable>
                             ))
                         )}
@@ -280,162 +303,140 @@ export function AddTransactionModal({
                 </ScrollView>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Description */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Description (optional)
-                </ThemedText>
+                </Text>
                 <TextInput
-                    style={[modalFormStyles.input, styles.descriptionInput]}
+                    style={[formStyles.input, styles.descriptionInput]}
                     value={description}
                     onChangeText={setDescription}
                     placeholder="Add a note..."
-                    placeholderTextColor="#999"
+                    placeholderTextColor={theme.colors.text.placeholder}
                     maxLength={500}
                     multiline
                     numberOfLines={3}
                     editable={!isSubmitting}
                 />
-                <ThemedText style={modalFormStyles.hint}>
+                <Text style={formStyles.hint}>
                     {description.length}/500 characters
-                </ThemedText>
+                </Text>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Date */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Date
-                </ThemedText>
-                <ThemedText style={styles.dateText}>
+                </Text>
+                <Text style={styles.dateText}>
                     {date.toLocaleDateString("en-US", {
                         weekday: "short",
                         year: "numeric",
                         month: "short",
                         day: "numeric",
                     })}
-                </ThemedText>
+                </Text>
             </View>
 
-            <Pressable
-                style={[
-                    styles.button,
-                    styles.buttonSubmit,
-                    isSubmitting && styles.buttonDisabled,
-                ]}
-                disabled={isSubmitting}
-                onPress={handleSubmit}
-            >
-                <ThemedText style={styles.buttonSubmitText}>
-                    {isSubmitting ? "Creating..." : "Create"}
-                </ThemedText>
-            </Pressable>
+            {/* Submit */}
+            <View colorValue="transparent" style={styles.submitButton}>
+                <Button
+                    variant="primary"
+                    size="lg"
+                    label={isSubmitting ? "Creating..." : "Create"}
+                    disabled={isSubmitting}
+                    loading={isSubmitting}
+                    onPress={handleSubmit}
+                />
+            </View>
         </BaseModal>
     );
 }
 
-const styles = StyleSheet.create({
-    amountInputContainer: {
-        flexDirection: "row",
-        alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        backgroundColor: "#fff",
-    },
-    currencySymbol: {
-        fontSize: 24,
-        fontWeight: "600",
-        marginRight: 4,
-        color: "#000",
-    },
-    amountInput: {
-        flex: 1,
-        fontSize: 24,
-        fontWeight: "600",
-        paddingVertical: 12,
-        color: "#000",
-    },
-    descriptionInput: {
-        minHeight: 80,
-        textAlignVertical: "top",
-    },
-    optionsContainer: {
-        flexDirection: "row",
-        gap: 8,
-        paddingVertical: 4,
-    },
-    optionButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-        backgroundColor: "rgba(0, 0, 0, 0.05)",
-        borderWidth: 2,
-        borderColor: "transparent",
-    },
-    optionButtonActive: {
-        backgroundColor: "#007AFF",
-        borderColor: "#0056b3",
-    },
-    optionText: {
-        fontSize: 14,
-        fontWeight: "600",
-        color: "#000",
-    },
-    optionTextActive: {
-        color: "#fff",
-    },
-    categoryButton: {
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        borderRadius: 20,
-        backgroundColor: "rgba(0, 0, 0, 0.05)",
-        borderWidth: 2,
-        borderColor: "transparent",
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-    },
-    categoryIcon: {
-        fontSize: 18,
-        lineHeight: 24,
-    },
-    categoryText: {
-        fontSize: 14,
-        fontWeight: "600",
-        color: "#000",
-    },
-    categoryTextActive: {
-        color: "#fff",
-    },
-    dateText: {
-        fontSize: 16,
-        padding: 12,
-        borderWidth: 1,
-        borderColor: "#ddd",
-        borderRadius: 8,
-        backgroundColor: "rgba(0, 0, 0, 0.02)",
-        color: "#000",
-    },
-    button: {
-        paddingVertical: 12,
-        borderRadius: 8,
-        alignItems: "center",
-        marginTop: 16,
-    },
-    buttonSubmit: {
-        backgroundColor: "#007AFF",
-    },
-    buttonSubmitText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    buttonDisabled: {
-        opacity: 0.6,
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        amountInputContainer: {
+            flexDirection: "row",
+            alignItems: "center",
+            borderWidth: 1,
+            borderColor: theme.colors.border.default,
+            borderRadius: theme.radii.sm,
+            paddingHorizontal: theme.spacing[3],
+            backgroundColor: theme.colors.surface.primary,
+        },
+        currencySymbol: {
+            ...theme.typography.amountInput,
+            color: theme.colors.text.primary,
+            marginRight: theme.spacing[1],
+        },
+        amountInput: {
+            flex: 1,
+            ...theme.typography.amountInput,
+            paddingVertical: theme.spacing[3],
+            color: theme.colors.text.primary,
+        },
+        descriptionInput: {
+            minHeight: 80,
+            textAlignVertical: "top",
+        },
+        optionsContainer: {
+            flexDirection: "row",
+            gap: theme.spacing[2],
+            paddingVertical: theme.spacing[1],
+        },
+        optionButton: {
+            paddingVertical: theme.spacing[2],
+            paddingHorizontal: theme.spacing[4],
+            borderRadius: theme.radii.pill,
+            backgroundColor: theme.colors.surface.muted,
+            borderWidth: 2,
+            borderColor: "transparent",
+        },
+        optionButtonActive: {
+            backgroundColor: theme.colors.interactive.primary.background,
+            borderColor: theme.colors.brand.strong,
+        },
+        optionText: {
+            ...theme.typography.labelSmall,
+            color: theme.colors.text.primary,
+        },
+        optionTextActive: {
+            color: theme.colors.interactive.primary.text,
+        },
+        categoryButton: {
+            paddingVertical: theme.spacing[2],
+            paddingHorizontal: theme.spacing[3],
+            borderRadius: theme.radii.pill,
+            backgroundColor: theme.colors.surface.muted,
+            borderWidth: 2,
+            borderColor: "transparent",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: theme.spacing[1],
+        },
+        categoryIcon: {
+            fontSize: 18,
+            lineHeight: 24,
+        },
+        categoryText: {
+            ...theme.typography.labelSmall,
+            color: theme.colors.text.primary,
+        },
+        categoryTextActive: {
+            color: "#fff",
+        },
+        dateText: {
+            ...theme.typography.body,
+            padding: theme.spacing[3],
+            borderWidth: 1,
+            borderColor: theme.colors.border.default,
+            borderRadius: theme.radii.sm,
+            backgroundColor: theme.colors.surface.subtle,
+            color: theme.colors.text.primary,
+        },
+        submitButton: {
+            marginTop: theme.spacing[4],
+        },
+    }),
+);

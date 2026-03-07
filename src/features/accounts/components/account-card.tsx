@@ -1,7 +1,11 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
+import {
+    Text,
+    View,
+    createThemedStyles,
+    useTheme,
+} from "@shared/design-system";
 import type { Account } from "@db/repositories";
 import { formatCurrency } from "@shared/utils/currency";
 
@@ -18,6 +22,9 @@ export function AccountCard({
     onLongPress,
     onDelete,
 }: AccountCardProps) {
+    const styles = useStyles();
+    const theme = useTheme();
+
     const balance = account.balance || 0;
     const isNegative = balance < 0;
 
@@ -30,20 +37,19 @@ export function AccountCard({
                 pressed && styles.cardPressed,
             ]}
         >
-            <ThemedView style={styles.content}>
-                <View style={styles.info}>
-                    <ThemedText type="defaultSemiBold" style={styles.name}>
-                        {account.name}
-                    </ThemedText>
-                    <ThemedText
-                        type="subtitle"
-                        style={[
-                            styles.balance,
-                            isNegative && styles.balanceNegative,
-                        ]}
+            <View style={styles.content}>
+                <View colorValue="transparent" style={styles.info}>
+                    <Text variant="bodySemibold">{account.name}</Text>
+                    <Text
+                        variant="amountLarge"
+                        colorValue={
+                            isNegative
+                                ? theme.colors.status.error
+                                : theme.colors.text.primary
+                        }
                     >
                         {formatCurrency(balance)}
-                    </ThemedText>
+                    </Text>
                 </View>
 
                 {onDelete && (
@@ -54,65 +60,56 @@ export function AccountCard({
                             pressed && styles.deleteButtonPressed,
                         ]}
                         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Delete ${account.name}`}
                     >
-                        <ThemedText style={styles.deleteText}>✕</ThemedText>
+                        <Text variant="bodySemibold" colorValue="#fff">
+                            ✕
+                        </Text>
                     </Pressable>
                 )}
-            </ThemedView>
+            </View>
         </Pressable>
     );
 }
 
-const styles = StyleSheet.create({
-    card: {
-        borderRadius: 12,
-        overflow: "hidden",
-        marginBottom: 12,
-        backgroundColor: "transparent",
-    },
-    cardPressed: {
-        opacity: 0.7,
-    },
-    content: {
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: 16,
-        backgroundColor: "rgba(0, 122, 255, 0.05)",
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: "rgba(0, 122, 255, 0.1)",
-    },
-    info: {
-        flex: 1,
-        gap: 4,
-    },
-    name: {
-        fontSize: 16,
-    },
-    balance: {
-        fontSize: 20,
-        fontWeight: "700",
-    },
-    balanceNegative: {
-        color: "#dc2626",
-    },
-    deleteButton: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: "#dc2626",
-        alignItems: "center",
-        justifyContent: "center",
-        marginLeft: 12,
-    },
-    deleteButtonPressed: {
-        opacity: 0.7,
-        transform: [{ scale: 0.95 }],
-    },
-    deleteText: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "600",
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        card: {
+            borderRadius: theme.radii.md,
+            overflow: "hidden",
+            marginBottom: theme.spacing[3],
+            backgroundColor: "transparent",
+        },
+        cardPressed: {
+            opacity: 0.7,
+        },
+        content: {
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: theme.spacing[4],
+            backgroundColor: theme.colors.surface.overlay,
+            borderRadius: theme.radii.md,
+            borderWidth: 1,
+            borderColor: theme.colors.border.brandSubtle,
+        },
+        info: {
+            flex: 1,
+            gap: theme.spacing[1],
+        },
+        deleteButton: {
+            width: 32,
+            height: 32,
+            borderRadius: theme.radii.circle,
+            backgroundColor: theme.colors.status.danger,
+            alignItems: "center",
+            justifyContent: "center",
+            marginLeft: theme.spacing[3],
+        },
+        deleteButtonPressed: {
+            opacity: 0.7,
+            transform: [{ scale: 0.95 }],
+        },
+    }),
+);

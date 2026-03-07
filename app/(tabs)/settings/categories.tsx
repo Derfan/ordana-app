@@ -1,18 +1,11 @@
-import { StyleSheet } from "react-native";
+import { View } from "@shared/design-system";
 
-import { ThemedView } from "@components/themed-view";
 import { CategoriesList } from "@features/categories";
 
 export default function CategoriesScreen() {
     return (
-        <ThemedView style={styles.container}>
+        <View surface="primary" style={{ flex: 1 }}>
             <CategoriesList />
-        </ThemedView>
+        </View>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-});

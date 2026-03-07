@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Alert, Pressable, StyleSheet, TextInput } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { BaseModal, modalFormStyles } from "@components/ui/base-modal";
+import { BaseModal } from "@components/ui/base-modal";
+import {
+    Button,
+    Text,
+    View,
+    createThemedStyles,
+    useModalFormStyles,
+    useTheme,
+} from "@shared/design-system";
 import type { CategoryType, NewCategory } from "@db/repositories";
 
 interface AddCategoryModalProps {
@@ -76,6 +83,10 @@ export function AddCategoryModal({
     const [selectedColor, setSelectedColor] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    const styles = useStyles();
+    const formStyles = useModalFormStyles();
+    const theme = useTheme();
+
     const handleClose = () => {
         if (!isSubmitting) {
             resetForm();
@@ -110,11 +121,11 @@ export function AddCategoryModal({
 
             resetForm();
             onClose();
-        } catch (error) {
+        } catch (err) {
             Alert.alert(
                 "Error",
-                error instanceof Error
-                    ? error.message
+                err instanceof Error
+                    ? err.message
                     : "Failed to create category",
             );
         } finally {
@@ -129,84 +140,76 @@ export function AddCategoryModal({
             onClose={handleClose}
             isSubmitting={isSubmitting}
         >
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Type */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Type
-                </ThemedText>
-                <View style={modalFormStyles.typeButtons}>
+                </Text>
+                <View colorValue="transparent" style={formStyles.typeButtons}>
                     <Pressable
                         onPress={() => setType("expense")}
                         style={[
-                            modalFormStyles.typeButton,
+                            formStyles.typeButton,
                             type === "expense" &&
-                                modalFormStyles.typeButtonActiveExpense,
+                                formStyles.typeButtonActiveExpense,
                         ]}
                     >
-                        <ThemedText
+                        <Text
                             style={[
-                                modalFormStyles.typeButtonText,
+                                formStyles.typeButtonText,
                                 type === "expense" &&
-                                    modalFormStyles.typeButtonTextActive,
+                                    formStyles.typeButtonTextActive,
                             ]}
                         >
                             Expenses
-                        </ThemedText>
+                        </Text>
                     </Pressable>
 
                     <Pressable
                         onPress={() => setType("income")}
                         style={[
-                            modalFormStyles.typeButton,
+                            formStyles.typeButton,
                             type === "income" &&
-                                modalFormStyles.typeButtonActiveIncome,
+                                formStyles.typeButtonActiveIncome,
                         ]}
                     >
-                        <ThemedText
+                        <Text
                             style={[
-                                modalFormStyles.typeButtonText,
+                                formStyles.typeButtonText,
                                 type === "income" &&
-                                    modalFormStyles.typeButtonTextActive,
+                                    formStyles.typeButtonTextActive,
                             ]}
                         >
                             Income
-                        </ThemedText>
+                        </Text>
                     </Pressable>
                 </View>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Name */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Name *
-                </ThemedText>
+                </Text>
                 <TextInput
-                    style={modalFormStyles.input}
+                    style={formStyles.input}
                     value={name}
                     onChangeText={setName}
                     placeholder="e.g., Groceries"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={theme.colors.text.placeholder}
                     maxLength={50}
                     autoFocus
                     editable={!isSubmitting}
                 />
-                <ThemedText style={modalFormStyles.hint}>
-                    {name.length}/50 characters
-                </ThemedText>
+                <Text style={formStyles.hint}>{name.length}/50 characters</Text>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Icon picker */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Icon
-                </ThemedText>
-                <View style={styles.iconsGrid}>
+                </Text>
+                <View colorValue="transparent" style={styles.iconsGrid}>
                     {CATEGORY_ICONS.map((icon, index) => (
                         <Pressable
                             key={index}
@@ -216,23 +219,24 @@ export function AddCategoryModal({
                                 selectedIcon === index &&
                                     styles.iconButtonActive,
                             ]}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Select icon ${icon}`}
+                            accessibilityState={{
+                                selected: selectedIcon === index,
+                            }}
                         >
-                            <ThemedText style={styles.iconText}>
-                                {icon}
-                            </ThemedText>
+                            <Text style={styles.iconText}>{icon}</Text>
                         </Pressable>
                     ))}
                 </View>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            {/* Color picker */}
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Color
-                </ThemedText>
-                <View style={styles.colorsGrid}>
+                </Text>
+                <View colorValue="transparent" style={styles.colorsGrid}>
                     {CATEGORY_COLORS.map((color, index) => (
                         <Pressable
                             key={index}
@@ -243,96 +247,85 @@ export function AddCategoryModal({
                                 selectedColor === index &&
                                     styles.colorButtonActive,
                             ]}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Select color ${color}`}
+                            accessibilityState={{
+                                selected: selectedColor === index,
+                            }}
                         >
                             {selectedColor === index && (
-                                <ThemedText style={styles.colorCheck}>
-                                    ✓
-                                </ThemedText>
+                                <Text style={styles.colorCheck}>✓</Text>
                             )}
                         </Pressable>
                     ))}
                 </View>
             </View>
 
-            <Pressable
-                style={[
-                    styles.button,
-                    styles.buttonSubmit,
-                    isSubmitting && styles.buttonDisabled,
-                ]}
-                disabled={isSubmitting}
-                onPress={handleSubmit}
-            >
-                <ThemedText style={styles.buttonSubmitText}>
-                    {isSubmitting ? "Creating..." : "Create"}
-                </ThemedText>
-            </Pressable>
+            {/* Submit */}
+            <View colorValue="transparent" style={styles.submitButton}>
+                <Button
+                    variant="primary"
+                    size="lg"
+                    label={isSubmitting ? "Creating..." : "Create"}
+                    disabled={isSubmitting}
+                    loading={isSubmitting}
+                    onPress={handleSubmit}
+                />
+            </View>
         </BaseModal>
     );
 }
 
-const styles = StyleSheet.create({
-    iconsGrid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 8,
-    },
-    iconButton: {
-        width: 50,
-        height: 50,
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: 8,
-        backgroundColor: "#f3f4f6",
-        borderWidth: 2,
-        borderColor: "transparent",
-    },
-    iconButtonActive: {
-        backgroundColor: "#e6f4f9",
-        borderColor: "#0a7ea4",
-    },
-    iconText: {
-        fontSize: 24,
-        lineHeight: 28,
-    },
-    colorsGrid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 12,
-    },
-    colorButton: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        alignItems: "center",
-        justifyContent: "center",
-        borderWidth: 3,
-        borderColor: "transparent",
-    },
-    colorButtonActive: {
-        borderColor: "#000",
-    },
-    colorCheck: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "#fff",
-        lineHeight: 24,
-    },
-    button: {
-        paddingVertical: 12,
-        borderRadius: 8,
-        alignItems: "center",
-        marginTop: 16,
-    },
-    buttonSubmit: {
-        backgroundColor: "#007AFF",
-    },
-    buttonSubmitText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    buttonDisabled: {
-        opacity: 0.6,
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        iconsGrid: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: theme.spacing[2],
+        },
+        iconButton: {
+            width: 50,
+            height: 50,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: theme.radii.sm,
+            backgroundColor: theme.colors.surface.muted,
+            borderWidth: 2,
+            borderColor: "transparent",
+        },
+        iconButtonActive: {
+            backgroundColor: theme.colors.surface.overlay,
+            borderColor: theme.colors.border.brandSubtle,
+        },
+        iconText: {
+            fontSize: 24,
+            lineHeight: 28,
+        },
+        colorsGrid: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: theme.spacing[3],
+        },
+        colorButton: {
+            width: 44,
+            height: 44,
+            borderRadius: theme.radii.full,
+            alignItems: "center",
+            justifyContent: "center",
+            borderWidth: 3,
+            borderColor: "transparent",
+        },
+        colorButtonActive: {
+            borderColor: theme.colors.border.default,
+        },
+        colorCheck: {
+            fontSize: 20,
+            fontWeight: "bold" as const,
+            color: "#fff",
+            lineHeight: 24,
+        },
+        submitButton: {
+            marginTop: theme.spacing[4],
+        },
+    }),
+);

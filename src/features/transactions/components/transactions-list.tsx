@@ -3,14 +3,11 @@ import {
     ActivityIndicator,
     Alert,
     FlatList,
-    Pressable,
     RefreshControl,
     StyleSheet,
-    View,
 } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
+import { Button, Text, View, createThemedStyles } from "@shared/design-system";
 import { useTransactions } from "@hooks/use-transactions";
 
 import { AddTransactionModal } from "./add-transaction-modal";
@@ -25,8 +22,11 @@ export function TransactionsList() {
         addTransaction,
         deleteTransaction,
     } = useTransactions(50);
+
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const styles = useStyles();
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
@@ -54,11 +54,11 @@ export function TransactionsList() {
                                 "Success",
                                 "Transaction deleted successfully",
                             );
-                        } catch (error) {
+                        } catch (err) {
                             Alert.alert(
                                 "Error",
-                                error instanceof Error
-                                    ? error.message
+                                err instanceof Error
+                                    ? err.message
                                     : "Failed to delete transaction",
                             );
                         }
@@ -70,35 +70,36 @@ export function TransactionsList() {
 
     if (error && transactions.length === 0) {
         return (
-            <ThemedView style={styles.centerContainer}>
-                <ThemedText style={styles.errorText}>❌ {error}</ThemedText>
-                <Pressable style={styles.retryButton} onPress={() => refresh()}>
-                    <ThemedText style={styles.retryButtonText}>
-                        Retry
-                    </ThemedText>
-                </Pressable>
-            </ThemedView>
+            <View surface="primary" style={styles.centerContainer}>
+                <Text style={styles.errorText}>❌ {error}</Text>
+                <Button
+                    variant="primary"
+                    size="md"
+                    label="Retry"
+                    onPress={() => refresh()}
+                />
+            </View>
         );
     }
 
     return (
-        <ThemedView style={styles.container}>
-            <View style={styles.header}>
-                <ThemedText type="title">History</ThemedText>
-                <Pressable
-                    style={styles.addButton}
+        <View surface="primary" style={styles.container}>
+            <View surface="primary" style={styles.header}>
+                <Text variant="heading1">History</Text>
+                <Button
+                    variant="primary"
+                    size="sm"
+                    label="+ Add"
                     onPress={() => setIsModalVisible(true)}
-                >
-                    <ThemedText style={styles.addButtonText}>+ Add</ThemedText>
-                </Pressable>
+                />
             </View>
 
             {isLoading && transactions.length === 0 ? (
-                <View style={styles.centerContainer}>
-                    <ActivityIndicator size="large" color="#0a7ea4" />
-                    <ThemedText style={styles.loadingText}>
+                <View surface="primary" style={styles.centerContainer}>
+                    <ActivityIndicator size="large" />
+                    <Text style={styles.loadingText}>
                         Loading transactions...
-                    </ThemedText>
+                    </Text>
                 </View>
             ) : (
                 <FlatList
@@ -113,33 +114,28 @@ export function TransactionsList() {
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <ThemedText style={styles.emptyIcon}>💸</ThemedText>
-                            <ThemedText
-                                type="subtitle"
-                                style={styles.emptyTitle}
-                            >
-                                No Transactions
-                            </ThemedText>
-                            <ThemedText style={styles.emptyText}>
+                        <View
+                            colorValue="transparent"
+                            style={styles.emptyContainer}
+                        >
+                            <Text style={styles.emptyIcon}>💸</Text>
+                            <Text variant="heading3">No Transactions</Text>
+                            <Text style={styles.emptyText}>
                                 Start tracking your finances by adding your
                                 first transaction
-                            </ThemedText>
-                            <Pressable
-                                style={styles.emptyButton}
+                            </Text>
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                label="Add Transaction"
                                 onPress={() => setIsModalVisible(true)}
-                            >
-                                <ThemedText style={styles.emptyButtonText}>
-                                    Add Transaction
-                                </ThemedText>
-                            </Pressable>
+                            />
                         </View>
                     }
                     refreshControl={
                         <RefreshControl
                             refreshing={isRefreshing}
                             onRefresh={handleRefresh}
-                            tintColor="#0a7ea4"
                         />
                     }
                 />
@@ -150,91 +146,60 @@ export function TransactionsList() {
                 onClose={() => setIsModalVisible(false)}
                 onSubmit={handleAddTransaction}
             />
-        </ThemedView>
+        </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: 20,
-        paddingBottom: 16,
-    },
-    addButton: {
-        backgroundColor: "#007AFF",
-        paddingVertical: 8,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-    },
-    addButtonText: {
-        color: "#fff",
-        fontSize: 15,
-        fontWeight: "600",
-    },
-    listContent: {
-        padding: 20,
-        paddingTop: 0,
-        paddingBottom: 40,
-    },
-    centerContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    loadingText: {
-        marginTop: 12,
-        opacity: 0.6,
-    },
-    errorText: {
-        fontSize: 16,
-        marginBottom: 16,
-        textAlign: "center",
-    },
-    retryButton: {
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        backgroundColor: "#007AFF",
-        borderRadius: 8,
-    },
-    retryButtonText: {
-        color: "#fff",
-        fontWeight: "600",
-    },
-    emptyContainer: {
-        alignItems: "center",
-        paddingVertical: 60,
-    },
-    emptyIcon: {
-        fontSize: 80,
-        marginBottom: 16,
-        lineHeight: 96,
-    },
-    emptyTitle: {
-        fontSize: 20,
-        marginBottom: 8,
-    },
-    emptyText: {
-        fontSize: 14,
-        opacity: 0.6,
-        textAlign: "center",
-        marginBottom: 24,
-        paddingHorizontal: 40,
-    },
-    emptyButton: {
-        backgroundColor: "#007AFF",
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
-    },
-    emptyButtonText: {
-        color: "#fff",
-        fontSize: 15,
-        fontWeight: "600",
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+        },
+        header: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: theme.spacing[5],
+            paddingBottom: theme.spacing[4],
+        },
+        listContent: {
+            padding: theme.spacing[5],
+            paddingTop: 0,
+            paddingBottom: theme.spacing[10],
+        },
+        centerContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: theme.spacing[5],
+            gap: theme.spacing[4],
+        },
+        loadingText: {
+            ...theme.typography.bodySmall,
+            color: theme.colors.text.muted,
+            marginTop: theme.spacing[3],
+        },
+        errorText: {
+            ...theme.typography.body,
+            color: theme.colors.status.error,
+            textAlign: "center",
+        },
+        emptyContainer: {
+            alignItems: "center",
+            paddingVertical: theme.spacing[16],
+            gap: theme.spacing[2],
+        },
+        emptyIcon: {
+            fontSize: 80,
+            lineHeight: 96,
+            marginBottom: theme.spacing[2],
+        },
+        emptyText: {
+            ...theme.typography.bodySmall,
+            color: theme.colors.text.muted,
+            textAlign: "center",
+            marginBottom: theme.spacing[4],
+            paddingHorizontal: theme.spacing[10],
+        },
+    }),
+);

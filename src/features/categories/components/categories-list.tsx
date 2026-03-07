@@ -6,11 +6,9 @@ import {
     Pressable,
     RefreshControl,
     StyleSheet,
-    View,
 } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
+import { Button, Text, View, createThemedStyles } from "@shared/design-system";
 import type { CategoryType } from "@db/repositories";
 import { useCategories } from "@hooks/use-categories";
 
@@ -31,6 +29,8 @@ export function CategoriesList() {
     const [activeTab, setActiveTab] = useState<CategoryType>("expense");
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const styles = useStyles();
 
     const displayCategories =
         activeTab === "income" ? incomeCategories : expenseCategories;
@@ -66,11 +66,11 @@ export function CategoriesList() {
                     onPress: async () => {
                         try {
                             await deleteCategory(id);
-                        } catch (error) {
+                        } catch (err) {
                             Alert.alert(
                                 "Error",
-                                error instanceof Error
-                                    ? error.message
+                                err instanceof Error
+                                    ? err.message
                                     : "Failed to delete category",
                             );
                         }
@@ -82,30 +82,31 @@ export function CategoriesList() {
 
     if (error && displayCategories.length === 0) {
         return (
-            <ThemedView style={styles.centerContainer}>
-                <ThemedText style={styles.errorText}>❌ {error}</ThemedText>
-                <Pressable style={styles.retryButton} onPress={refresh}>
-                    <ThemedText style={styles.retryButtonText}>
-                        Retry
-                    </ThemedText>
-                </Pressable>
-            </ThemedView>
+            <View surface="primary" style={styles.centerContainer}>
+                <Text style={styles.errorText}>❌ {error}</Text>
+                <Button
+                    variant="primary"
+                    size="md"
+                    label="Retry"
+                    onPress={refresh}
+                />
+            </View>
         );
     }
 
     return (
-        <ThemedView style={styles.container}>
-            <View style={styles.header}>
-                <ThemedText type="title">Categories</ThemedText>
-                <Pressable
-                    style={styles.addButton}
+        <View surface="primary" style={styles.container}>
+            <View surface="primary" style={styles.header}>
+                <Text variant="heading1">Categories</Text>
+                <Button
+                    variant="primary"
+                    size="sm"
+                    label="+ Add"
                     onPress={() => setIsModalVisible(true)}
-                >
-                    <ThemedText style={styles.addButtonText}>+ Add</ThemedText>
-                </Pressable>
+                />
             </View>
 
-            <View style={styles.tabs}>
+            <View colorValue="transparent" style={styles.tabs}>
                 <Pressable
                     style={[
                         styles.tab,
@@ -113,14 +114,14 @@ export function CategoriesList() {
                     ]}
                     onPress={() => setActiveTab("expense")}
                 >
-                    <ThemedText
+                    <Text
                         style={[
                             styles.tabText,
                             activeTab === "expense" && styles.tabTextActive,
                         ]}
                     >
                         Expenses ({expenseCategories.length})
-                    </ThemedText>
+                    </Text>
                 </Pressable>
 
                 <Pressable
@@ -130,23 +131,23 @@ export function CategoriesList() {
                     ]}
                     onPress={() => setActiveTab("income")}
                 >
-                    <ThemedText
+                    <Text
                         style={[
                             styles.tabText,
                             activeTab === "income" && styles.tabTextActive,
                         ]}
                     >
                         Income ({incomeCategories.length})
-                    </ThemedText>
+                    </Text>
                 </Pressable>
             </View>
 
             {isLoading && displayCategories.length === 0 ? (
-                <View style={styles.centerContainer}>
-                    <ActivityIndicator size="large" color="#0a7ea4" />
-                    <ThemedText style={styles.loadingText}>
+                <View surface="primary" style={styles.centerContainer}>
+                    <ActivityIndicator size="large" />
+                    <Text style={styles.loadingText}>
                         Loading categories...
-                    </ThemedText>
+                    </Text>
                 </View>
             ) : (
                 <FlatList
@@ -167,26 +168,23 @@ export function CategoriesList() {
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <ThemedText style={styles.emptyIcon}>📂</ThemedText>
-                            <ThemedText
-                                type="subtitle"
-                                style={styles.emptyTitle}
-                            >
-                                No Categories
-                            </ThemedText>
-                            <ThemedText style={styles.emptyText}>
+                        <View
+                            colorValue="transparent"
+                            style={styles.emptyContainer}
+                        >
+                            <Text style={styles.emptyIcon}>📂</Text>
+                            <Text variant="heading3">No Categories</Text>
+                            <Text style={styles.emptyText}>
                                 {activeTab === "income"
                                     ? "Create an income category"
                                     : "Create an expense category"}
-                            </ThemedText>
+                            </Text>
                         </View>
                     }
                     refreshControl={
                         <RefreshControl
                             refreshing={isRefreshing}
                             onRefresh={handleRefresh}
-                            tintColor="#0a7ea4"
                         />
                     }
                 />
@@ -198,102 +196,80 @@ export function CategoriesList() {
                 onSubmit={handleAddCategory}
                 defaultType={activeTab}
             />
-        </ThemedView>
+        </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: 20,
-        paddingBottom: 16,
-    },
-    addButton: {
-        backgroundColor: "#0a7ea4",
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    addButtonText: {
-        color: "#fff",
-        fontSize: 14,
-        fontWeight: "600",
-    },
-    tabs: {
-        flexDirection: "row",
-        paddingHorizontal: 20,
-        marginBottom: 16,
-        gap: 12,
-    },
-    tab: {
-        flex: 1,
-        padding: 12,
-        borderRadius: 8,
-        alignItems: "center",
-        backgroundColor: "#f3f4f6",
-    },
-    tabActive: {
-        backgroundColor: "#0a7ea4",
-    },
-    tabText: {
-        fontSize: 14,
-        fontWeight: "600",
-        color: "#6b7280",
-    },
-    tabTextActive: {
-        color: "#fff",
-    },
-    listContent: {
-        flexGrow: 1,
-        paddingHorizontal: 20,
-        paddingBottom: 0,
-    },
-    centerContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    errorText: {
-        fontSize: 16,
-        color: "#dc2626",
-        marginBottom: 16,
-        textAlign: "center",
-    },
-    retryButton: {
-        backgroundColor: "#0a7ea4",
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    retryButtonText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    loadingText: {
-        marginTop: 12,
-        color: "#666",
-    },
-    emptyContainer: {
-        alignItems: "center",
-        paddingVertical: 60,
-    },
-    emptyIcon: {
-        fontSize: 64,
-        marginBottom: 16,
-    },
-    emptyTitle: {
-        marginBottom: 8,
-    },
-    emptyText: {
-        fontSize: 14,
-        color: "#666",
-        textAlign: "center",
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+        },
+        header: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: theme.spacing[5],
+            paddingBottom: theme.spacing[4],
+        },
+        tabs: {
+            flexDirection: "row",
+            paddingHorizontal: theme.spacing[5],
+            marginBottom: theme.spacing[4],
+            gap: theme.spacing[3],
+        },
+        tab: {
+            flex: 1,
+            padding: theme.spacing[3],
+            borderRadius: theme.radii.sm,
+            alignItems: "center",
+            backgroundColor: theme.colors.surface.muted,
+        },
+        tabActive: {
+            backgroundColor: theme.colors.interactive.primary.background,
+        },
+        tabText: {
+            ...theme.typography.labelSmall,
+            color: theme.colors.text.muted,
+        },
+        tabTextActive: {
+            color: theme.colors.interactive.primary.text,
+        },
+        listContent: {
+            flexGrow: 1,
+            paddingHorizontal: theme.spacing[5],
+            paddingBottom: 0,
+        },
+        centerContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: theme.spacing[5],
+        },
+        errorText: {
+            ...theme.typography.body,
+            color: theme.colors.status.error,
+            marginBottom: theme.spacing[4],
+            textAlign: "center",
+        },
+        loadingText: {
+            ...theme.typography.bodySmall,
+            color: theme.colors.text.muted,
+            marginTop: theme.spacing[3],
+        },
+        emptyContainer: {
+            alignItems: "center",
+            paddingVertical: theme.spacing[16],
+        },
+        emptyIcon: {
+            fontSize: 64,
+            marginBottom: theme.spacing[4],
+        },
+        emptyText: {
+            ...theme.typography.bodySmall,
+            color: theme.colors.text.muted,
+            textAlign: "center",
+            marginTop: theme.spacing[2],
+        },
+    }),
+);

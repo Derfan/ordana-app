@@ -3,14 +3,11 @@ import {
     ActivityIndicator,
     Alert,
     FlatList,
-    Pressable,
     RefreshControl,
     StyleSheet,
-    View,
 } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
+import { Button, Text, View, createThemedStyles } from "@shared/design-system";
 import { useAccounts } from "@hooks/use-accounts";
 import { formatCurrency } from "@shared/utils/currency";
 
@@ -27,8 +24,11 @@ export function AccountsList() {
         deleteAccount,
         totalBalance,
     } = useAccounts();
+
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const styles = useStyles();
 
     const handleRefresh = async () => {
         setIsRefreshing(true);
@@ -52,11 +52,11 @@ export function AccountsList() {
                     onPress: async () => {
                         try {
                             await deleteAccount(id);
-                        } catch (error) {
+                        } catch (err) {
                             Alert.alert(
                                 "Error",
-                                error instanceof Error
-                                    ? error.message
+                                err instanceof Error
+                                    ? err.message
                                     : "Failed to delete account",
                             );
                         }
@@ -68,43 +68,45 @@ export function AccountsList() {
 
     if (error && accounts.length === 0) {
         return (
-            <ThemedView style={styles.centerContainer}>
-                <ThemedText style={styles.errorText}>❌ {error}</ThemedText>
-                <Pressable style={styles.retryButton} onPress={refresh}>
-                    <ThemedText style={styles.retryButtonText}>
-                        Retry
-                    </ThemedText>
-                </Pressable>
-            </ThemedView>
+            <View surface="primary" style={styles.centerContainer}>
+                <Text style={styles.errorText}>❌ {error}</Text>
+                <Button
+                    variant="primary"
+                    size="md"
+                    label="Retry"
+                    onPress={refresh}
+                />
+            </View>
         );
     }
 
     return (
-        <ThemedView style={styles.container}>
-            <View style={styles.header}>
-                <View>
-                    <ThemedText style={styles.headerLabel}>
+        <View surface="primary" style={styles.container}>
+            <View surface="primary" style={styles.header}>
+                <View
+                    colorValue="transparent"
+                    style={styles.headerBalanceBlock}
+                >
+                    <Text variant="bodySmall" color="muted">
                         Total Balance
-                    </ThemedText>
-                    <ThemedText type="title" style={styles.totalBalance}>
+                    </Text>
+                    <Text variant="heading1">
                         {formatCurrency(totalBalance)}
-                    </ThemedText>
+                    </Text>
                 </View>
 
-                <Pressable
-                    style={styles.addButton}
+                <Button
+                    variant="primary"
+                    size="sm"
+                    label="+ Add"
                     onPress={() => setIsModalVisible(true)}
-                >
-                    <ThemedText style={styles.addButtonText}>+ Add</ThemedText>
-                </Pressable>
+                />
             </View>
 
             {isLoading && accounts.length === 0 ? (
-                <View style={styles.centerContainer}>
-                    <ActivityIndicator size="large" color="#0a7ea4" />
-                    <ThemedText style={styles.loadingText}>
-                        Loading accounts...
-                    </ThemedText>
+                <View surface="primary" style={styles.centerContainer}>
+                    <ActivityIndicator size="large" />
+                    <Text style={styles.loadingText}>Loading accounts...</Text>
                 </View>
             ) : (
                 <FlatList
@@ -121,33 +123,28 @@ export function AccountsList() {
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
                     ListEmptyComponent={
-                        <View style={styles.emptyContainer}>
-                            <ThemedText style={styles.emptyIcon}>🏦</ThemedText>
-                            <ThemedText
-                                type="subtitle"
-                                style={styles.emptyTitle}
-                            >
-                                No Accounts
-                            </ThemedText>
-                            <ThemedText style={styles.emptyText}>
+                        <View
+                            colorValue="transparent"
+                            style={styles.emptyContainer}
+                        >
+                            <Text style={styles.emptyIcon}>🏦</Text>
+                            <Text variant="heading3">No Accounts</Text>
+                            <Text style={styles.emptyText}>
                                 Create your first account to start tracking your
                                 finances
-                            </ThemedText>
-                            <Pressable
-                                style={styles.emptyButton}
+                            </Text>
+                            <Button
+                                variant="primary"
+                                size="lg"
+                                label="Create Account"
                                 onPress={() => setIsModalVisible(true)}
-                            >
-                                <ThemedText style={styles.emptyButtonText}>
-                                    Create Account
-                                </ThemedText>
-                            </Pressable>
+                            />
                         </View>
                     }
                     refreshControl={
                         <RefreshControl
                             refreshing={isRefreshing}
                             onRefresh={handleRefresh}
-                            tintColor="#0a7ea4"
                         />
                     }
                 />
@@ -158,100 +155,62 @@ export function AccountsList() {
                 onClose={() => setIsModalVisible(false)}
                 onSubmit={handleAddAccount}
             />
-        </ThemedView>
+        </View>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: 20,
-        paddingBottom: 16,
-    },
-    headerLabel: {
-        fontSize: 14,
-        color: "#666",
-        marginBottom: 4,
-    },
-    totalBalance: {
-        fontSize: 32,
-        fontWeight: "700",
-    },
-    addButton: {
-        backgroundColor: "#0a7ea4",
-        paddingHorizontal: 16,
-        paddingVertical: 10,
-        borderRadius: 8,
-    },
-    addButtonText: {
-        color: "#fff",
-        fontSize: 14,
-        fontWeight: "600",
-    },
-    listContent: {
-        flexGrow: 1,
-        paddingHorizontal: 20,
-        paddingBottom: 0,
-    },
-    centerContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        padding: 20,
-    },
-    errorText: {
-        fontSize: 16,
-        color: "#dc2626",
-        marginBottom: 16,
-        textAlign: "center",
-    },
-    retryButton: {
-        backgroundColor: "#0a7ea4",
-        paddingHorizontal: 24,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    retryButtonText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    loadingText: {
-        marginTop: 12,
-        color: "#666",
-    },
-    emptyContainer: {
-        alignItems: "center",
-        paddingVertical: 60,
-    },
-    emptyIcon: {
-        fontSize: 64,
-        marginBottom: 16,
-    },
-    emptyTitle: {
-        marginBottom: 8,
-    },
-    emptyText: {
-        fontSize: 14,
-        color: "#666",
-        textAlign: "center",
-        marginBottom: 24,
-        lineHeight: 20,
-    },
-    emptyButton: {
-        backgroundColor: "#0a7ea4",
-        paddingHorizontal: 32,
-        paddingVertical: 14,
-        borderRadius: 8,
-    },
-    emptyButtonText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+        },
+        header: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: theme.spacing[5],
+            paddingBottom: theme.spacing[4],
+        },
+        headerBalanceBlock: {
+            gap: theme.spacing[1],
+        },
+        listContent: {
+            flexGrow: 1,
+            paddingHorizontal: theme.spacing[5],
+            paddingBottom: 0,
+        },
+        centerContainer: {
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: theme.spacing[5],
+            gap: theme.spacing[4],
+        },
+        errorText: {
+            ...theme.typography.body,
+            color: theme.colors.status.error,
+            textAlign: "center",
+        },
+        loadingText: {
+            ...theme.typography.bodySmall,
+            color: theme.colors.text.muted,
+            marginTop: theme.spacing[3],
+        },
+        emptyContainer: {
+            alignItems: "center",
+            paddingVertical: theme.spacing[16],
+            gap: theme.spacing[2],
+        },
+        emptyIcon: {
+            fontSize: 64,
+            marginBottom: theme.spacing[2],
+        },
+        emptyText: {
+            ...theme.typography.bodySmall,
+            color: theme.colors.text.muted,
+            textAlign: "center",
+            lineHeight: 20,
+            marginBottom: theme.spacing[4],
+        },
+    }),
+);

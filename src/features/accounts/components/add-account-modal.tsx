@@ -1,8 +1,15 @@
 import { useState } from "react";
-import { Alert, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Alert, Pressable, StyleSheet, TextInput } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { BaseModal, modalFormStyles } from "@components/ui/base-modal";
+import {
+    Button,
+    Text,
+    View,
+    createThemedStyles,
+    useModalFormStyles,
+    useTheme,
+} from "@shared/design-system";
+import { BaseModal } from "@components/ui/base-modal";
 import type { NewAccount } from "@db/repositories";
 
 interface AddAccountModalProps {
@@ -27,6 +34,10 @@ export function AddAccountModal({
     const [balance, setBalance] = useState("0");
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedType, setSelectedType] = useState(0);
+
+    const styles = useStyles();
+    const formStyles = useModalFormStyles();
+    const theme = useTheme();
 
     const handleClose = () => {
         if (!isSubmitting) {
@@ -91,14 +102,11 @@ export function AddAccountModal({
             onClose={handleClose}
             isSubmitting={isSubmitting}
         >
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Account Type
-                </ThemedText>
-                <View style={styles.typeGrid}>
+                </Text>
+                <View colorValue="transparent" style={styles.typeGrid}>
                     {ACCOUNT_TYPES.map((type, index) => (
                         <Pressable
                             key={index}
@@ -108,11 +116,13 @@ export function AddAccountModal({
                                 selectedType === index &&
                                     styles.typeButtonActive,
                             ]}
+                            accessibilityRole="button"
+                            accessibilityState={{
+                                selected: selectedType === index,
+                            }}
                         >
-                            <ThemedText style={styles.typeIcon}>
-                                {type.icon}
-                            </ThemedText>
-                            <ThemedText
+                            <Text style={styles.typeIcon}>{type.icon}</Text>
+                            <Text
                                 style={[
                                     styles.typeLabel,
                                     selectedType === index &&
@@ -120,134 +130,114 @@ export function AddAccountModal({
                                 ]}
                             >
                                 {type.label}
-                            </ThemedText>
+                            </Text>
                         </Pressable>
                     ))}
                 </View>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Name *
-                </ThemedText>
+                </Text>
                 <TextInput
-                    style={modalFormStyles.input}
+                    style={formStyles.input}
                     value={name}
                     onChangeText={setName}
                     placeholder="e.g., Main Card"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={theme.colors.text.placeholder}
                     maxLength={100}
                     autoFocus
                     editable={!isSubmitting}
                 />
-                <ThemedText style={modalFormStyles.hint}>
+                <Text style={formStyles.hint}>
                     {name.length}/100 characters
-                </ThemedText>
+                </Text>
             </View>
 
-            <View style={modalFormStyles.section}>
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={modalFormStyles.label}
-                >
+            <View colorValue="transparent" style={formStyles.section}>
+                <Text variant="label" style={formStyles.label}>
                     Initial Balance
-                </ThemedText>
-                <View style={styles.balanceInput}>
+                </Text>
+                <View
+                    colorValue="transparent"
+                    style={styles.balanceInputWrapper}
+                >
                     <TextInput
-                        style={modalFormStyles.input}
+                        style={formStyles.input}
                         value={balance}
                         onChangeText={handleBalanceChange}
                         placeholder="0"
-                        placeholderTextColor="#999"
+                        placeholderTextColor={theme.colors.text.placeholder}
                         keyboardType="numeric"
                         editable={!isSubmitting}
                     />
-                    <ThemedText style={styles.currency}>€</ThemedText>
+                    <Text style={styles.currencySymbol}>€</Text>
                 </View>
-                <ThemedText style={modalFormStyles.hint}>
+                <Text style={formStyles.hint}>
                     Enter the current account balance
-                </ThemedText>
+                </Text>
             </View>
 
-            <Pressable
-                style={[
-                    styles.button,
-                    styles.buttonSubmit,
-                    isSubmitting && styles.buttonDisabled,
-                ]}
-                disabled={isSubmitting}
-                onPress={handleSubmit}
-            >
-                <ThemedText style={styles.buttonSubmitText}>
-                    {isSubmitting ? "Creating..." : "Create"}
-                </ThemedText>
-            </Pressable>
+            <View colorValue="transparent" style={styles.submitButton}>
+                <Button
+                    variant="primary"
+                    size="lg"
+                    label={isSubmitting ? "Creating..." : "Create"}
+                    disabled={isSubmitting}
+                    loading={isSubmitting}
+                    onPress={handleSubmit}
+                />
+            </View>
         </BaseModal>
     );
 }
 
-const styles = StyleSheet.create({
-    typeGrid: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 12,
-    },
-    typeButton: {
-        flex: 1,
-        minWidth: "45%",
-        alignItems: "center",
-        padding: 16,
-        borderRadius: 12,
-        borderWidth: 2,
-        borderColor: "#ddd",
-        backgroundColor: "#f9f9f9",
-    },
-    typeButtonActive: {
-        borderColor: "#0a7ea4",
-        backgroundColor: "#e6f4f9",
-    },
-    typeIcon: {
-        fontSize: 32,
-        lineHeight: 40,
-        marginBottom: 8,
-    },
-    typeLabel: {
-        fontSize: 14,
-        color: "#666",
-    },
-    typeLabelActive: {
-        color: "#0a7ea4",
-        fontWeight: "600",
-    },
-    balanceInput: {
-        position: "relative",
-    },
-    currency: {
-        position: "absolute",
-        right: 16,
-        top: 12,
-        fontSize: 16,
-        fontWeight: "600",
-        color: "#666",
-    },
-    button: {
-        paddingVertical: 12,
-        borderRadius: 8,
-        alignItems: "center",
-        marginTop: 16,
-    },
-    buttonSubmit: {
-        backgroundColor: "#007AFF",
-    },
-    buttonSubmitText: {
-        color: "#fff",
-        fontSize: 16,
-        fontWeight: "600",
-    },
-    buttonDisabled: {
-        opacity: 0.6,
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        typeGrid: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: theme.spacing[3],
+        },
+        typeButton: {
+            flex: 1,
+            minWidth: "45%",
+            alignItems: "center",
+            padding: theme.spacing[4],
+            borderRadius: theme.radii.md,
+            borderWidth: 2,
+            borderColor: theme.colors.border.default,
+            backgroundColor: theme.colors.surface.subtle,
+        },
+        typeButtonActive: {
+            borderColor: theme.colors.brand.default,
+            backgroundColor: theme.colors.surface.overlay,
+        },
+        typeIcon: {
+            fontSize: 32,
+            lineHeight: 40,
+            marginBottom: theme.spacing[2],
+        },
+        typeLabel: {
+            ...theme.typography.labelSmall,
+            color: theme.colors.text.muted,
+        },
+        typeLabelActive: {
+            color: theme.colors.brand.default,
+        },
+        balanceInputWrapper: {
+            position: "relative",
+        },
+        currencySymbol: {
+            position: "absolute",
+            right: theme.spacing[4],
+            top: theme.spacing[3],
+            ...theme.typography.body,
+            color: theme.colors.text.muted,
+        },
+        submitButton: {
+            marginTop: theme.spacing[4],
+        },
+    }),
+);

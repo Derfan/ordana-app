@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 import {
     KeyboardAvoidingView,
     Modal,
@@ -6,139 +6,164 @@ import {
     Pressable,
     ScrollView,
     StyleSheet,
-    View,
-} from 'react-native';
+} from "react-native";
 
-import { ThemedText } from '@components/themed-text';
-import { ThemedView } from '@components/themed-view';
+import { Text, View, createThemedStyles } from "@shared/design-system";
 
 interface BaseModalProps {
-  visible: boolean;
-  title: string;
-  onClose: () => void;
-  children: ReactNode;
-  isSubmitting?: boolean;
+    visible: boolean;
+    title: string;
+    onClose: () => void;
+    children: ReactNode;
+    isSubmitting?: boolean;
 }
 
 export function BaseModal({
-  visible,
-  title,
-  onClose,
-  children,
-  isSubmitting = false,
+    visible,
+    title,
+    onClose,
+    children,
+    isSubmitting = false,
 }: BaseModalProps) {
-  const handleClose = () => {
-    if (!isSubmitting) {
-      onClose();
-    }
-  };
+    const styles = useStyles();
 
-  return (
-    <Modal
-      visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
-      onRequestClose={handleClose}>
-      <ThemedView style={styles.container}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.keyboardView}>
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}>
-            <View style={styles.header}>
-              <ThemedText type="title">{title}</ThemedText>
-              <Pressable onPress={handleClose} disabled={isSubmitting}>
-                <ThemedText style={styles.closeButton}>✕</ThemedText>
-              </Pressable>
+    const handleClose = () => {
+        if (!isSubmitting) {
+            onClose();
+        }
+    };
+
+    return (
+        <Modal
+            visible={visible}
+            animationType="slide"
+            presentationStyle="pageSheet"
+            onRequestClose={handleClose}
+        >
+            <View surface="primary" style={styles.container}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={styles.keyboardView}
+                >
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContent}
+                        showsVerticalScrollIndicator={false}
+                    >
+                        <View surface="primary" style={styles.header}>
+                            <Text variant="heading1">{title}</Text>
+                            <Pressable
+                                onPress={handleClose}
+                                disabled={isSubmitting}
+                                hitSlop={{
+                                    top: 12,
+                                    bottom: 12,
+                                    left: 12,
+                                    right: 12,
+                                }}
+                                style={({ pressed }) =>
+                                    pressed && styles.closeButtonPressed
+                                }
+                                accessibilityRole="button"
+                                accessibilityLabel="Close modal"
+                            >
+                                <Text color="subtle" style={styles.closeButton}>
+                                    ✕
+                                </Text>
+                            </Pressable>
+                        </View>
+
+                        {children}
+                    </ScrollView>
+                </KeyboardAvoidingView>
             </View>
-
-            {children}
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </ThemedView>
-    </Modal>
-  );
+        </Modal>
+    );
 }
 
-export const modalFormStyles = StyleSheet.create({
-  section: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    backgroundColor: '#fff',
-    color: '#000',
-  },
-  hint: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  typeButtons: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  typeButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    backgroundColor: '#f3f4f6',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  typeButtonActiveExpense: {
-    backgroundColor: '#fee2e2',
-    borderColor: '#ef4444',
-  },
-  typeButtonActiveIncome: {
-    backgroundColor: '#d1fae5',
-    borderColor: '#10b981',
-  },
-  typeButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6b7280',
-  },
-  typeButtonTextActive: {
-    color: '#000',
-  },
-  emptyText: {
-    fontSize: 14,
-    opacity: 0.5,
-    fontStyle: 'italic',
-  },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        container: {
+            flex: 1,
+        },
+        keyboardView: {
+            flex: 1,
+        },
+        scrollContent: {
+            paddingVertical: theme.spacing[10],
+            paddingHorizontal: theme.spacing[5],
+        },
+        header: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: theme.spacing[8],
+        },
+        closeButton: {
+            fontSize: 28,
+            lineHeight: 32,
+        },
+        closeButtonPressed: {
+            opacity: 0.5,
+        },
+    }),
+);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingVertical: 40,
-    paddingHorizontal: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  closeButton: {
-    fontSize: 28,
-    color: '#666',
-    lineHeight: 32,
-  },
-});
+export const useModalFormStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        section: {
+            marginBottom: theme.spacing[6],
+        },
+        label: {
+            ...theme.typography.label,
+            color: theme.colors.text.primary,
+            marginBottom: theme.spacing[2],
+        },
+        input: {
+            borderWidth: 1,
+            borderColor: theme.colors.border.default,
+            borderRadius: theme.radii.sm,
+            padding: theme.spacing[3],
+            ...theme.typography.body,
+            backgroundColor: theme.colors.surface.primary,
+            color: theme.colors.text.primary,
+        },
+        hint: {
+            ...theme.typography.hint,
+            color: theme.colors.text.subtle,
+            marginTop: theme.spacing[1],
+        },
+        typeButtons: {
+            flexDirection: "row",
+            gap: theme.spacing[3],
+        },
+        typeButton: {
+            flex: 1,
+            padding: theme.spacing[3],
+            borderRadius: theme.radii.sm,
+            alignItems: "center",
+            backgroundColor: theme.colors.surface.muted,
+            borderWidth: 2,
+            borderColor: "transparent",
+        },
+        typeButtonActiveExpense: {
+            backgroundColor: theme.colors.status.expenseSubtle,
+            borderColor: theme.colors.status.expenseBorder,
+        },
+        typeButtonActiveIncome: {
+            backgroundColor: theme.colors.status.incomeSubtle,
+            borderColor: theme.colors.status.incomeBorder,
+        },
+        typeButtonText: {
+            ...theme.typography.labelSmall,
+            color: theme.colors.text.muted,
+        },
+        typeButtonTextActive: {
+            color: theme.colors.text.primary,
+        },
+        emptyText: {
+            ...theme.typography.bodySmall,
+            color: theme.colors.text.muted,
+            fontStyle: "italic",
+        },
+    }),
+);

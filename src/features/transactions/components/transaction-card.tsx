@@ -1,7 +1,11 @@
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
+import {
+    Text,
+    View,
+    createThemedStyles,
+    useTheme,
+} from "@shared/design-system";
 import type { TransactionWithDetails } from "@db/repositories";
 import { formatCurrency } from "@shared/utils/currency";
 import { formatDate } from "@shared/utils/date";
@@ -17,9 +21,14 @@ export function TransactionCard({
     onPress,
     onLongPress,
 }: TransactionCardProps) {
+    const styles = useStyles();
+    const theme = useTheme();
+
     const isIncome = transaction.type === "income";
     const sign = isIncome ? "+" : "-";
-    const amountColor = isIncome ? "#10b981" : "#ef4444";
+    const amountColor = isIncome
+        ? theme.colors.status.income
+        : theme.colors.status.expense;
 
     return (
         <Pressable
@@ -29,142 +38,115 @@ export function TransactionCard({
                 styles.card,
                 pressed && styles.cardPressed,
             ]}
+            accessibilityRole="button"
+            accessibilityLabel={`${transaction.category.name}, ${sign}${formatCurrency(transaction.amount)}`}
         >
-            <ThemedView style={styles.content}>
-                {/* Category Icon with color indicator */}
+            <View style={styles.content}>
+                {/* Category icon with color badge */}
                 <View
-                    style={[
-                        styles.iconContainer,
-                        { backgroundColor: `${transaction.category.color}20` },
-                    ]}
+                    colorValue={`${transaction.category.color}20`}
+                    style={styles.iconContainer}
                 >
-                    <ThemedText style={styles.icon}>
-                        {transaction.category.icon}
-                    </ThemedText>
+                    <Text style={styles.icon}>{transaction.category.icon}</Text>
                     <View
-                        style={[
-                            styles.colorIndicator,
-                            { backgroundColor: transaction.category.color },
-                        ]}
+                        colorValue={transaction.category.color}
+                        style={styles.colorIndicator}
                     />
                 </View>
 
-                {/* Transaction Info */}
-                <View style={styles.info}>
-                    <ThemedText
-                        type="defaultSemiBold"
-                        style={styles.categoryName}
-                    >
+                {/* Transaction info */}
+                <View colorValue="transparent" style={styles.info}>
+                    <Text variant="bodySemibold">
                         {transaction.category.name}
-                    </ThemedText>
-                    <View style={styles.details}>
-                        <ThemedText style={styles.accountName}>
+                    </Text>
+                    <View colorValue="transparent" style={styles.details}>
+                        <Text variant="caption" color="muted">
                             {transaction.account.name}
-                        </ThemedText>
+                        </Text>
                         {transaction.description && (
                             <>
-                                <ThemedText style={styles.separator}>
+                                <Text variant="caption" color="subtle">
                                     •
-                                </ThemedText>
-                                <ThemedText
-                                    style={styles.description}
+                                </Text>
+                                <Text
+                                    variant="caption"
+                                    color="muted"
                                     numberOfLines={1}
                                 >
                                     {transaction.description}
-                                </ThemedText>
+                                </Text>
                             </>
                         )}
                     </View>
-                    <ThemedText style={styles.date}>
+                    <Text variant="hint" color="subtle">
                         {formatDate(transaction.date)}
-                    </ThemedText>
+                    </Text>
                 </View>
 
                 {/* Amount */}
-                <ThemedText
-                    type="defaultSemiBold"
-                    style={[styles.amount, { color: amountColor }]}
-                >
+                <Text style={[styles.amount, { color: amountColor }]}>
                     {sign}
                     {formatCurrency(transaction.amount)}
-                </ThemedText>
-            </ThemedView>
+                </Text>
+            </View>
         </Pressable>
     );
 }
 
-const styles = StyleSheet.create({
-    card: {
-        borderRadius: 12,
-        overflow: "hidden",
-        marginBottom: 12,
-    },
-    cardPressed: {
-        opacity: 0.7,
-    },
-    content: {
-        flexDirection: "row",
-        alignItems: "center",
-        padding: 16,
-        gap: 12,
-        backgroundColor: "rgba(0, 0, 0, 0.02)",
-        borderRadius: 12,
-    },
-    iconContainer: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-    },
-    icon: {
-        fontSize: 24,
-    },
-    colorIndicator: {
-        position: "absolute",
-        bottom: 0,
-        right: 0,
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        borderWidth: 2,
-        borderColor: "#fff",
-    },
-    info: {
-        flex: 1,
-        gap: 2,
-    },
-    categoryName: {
-        fontSize: 16,
-    },
-    details: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-        flexWrap: "wrap",
-    },
-    accountName: {
-        fontSize: 13,
-        opacity: 0.6,
-    },
-    separator: {
-        fontSize: 13,
-        opacity: 0.4,
-    },
-    description: {
-        fontSize: 13,
-        opacity: 0.6,
-        flex: 1,
-    },
-    date: {
-        fontSize: 12,
-        opacity: 0.5,
-    },
-    amount: {
-        fontSize: 18,
-        fontWeight: "700",
-        minWidth: 80,
-        textAlign: "right",
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        card: {
+            borderRadius: theme.radii.md,
+            overflow: "hidden",
+            marginBottom: theme.spacing[3],
+        },
+        cardPressed: {
+            opacity: 0.7,
+        },
+        content: {
+            flexDirection: "row",
+            alignItems: "center",
+            padding: theme.spacing[4],
+            gap: theme.spacing[3],
+            backgroundColor: theme.colors.surface.subtle,
+            borderRadius: theme.radii.md,
+        },
+        iconContainer: {
+            width: 48,
+            height: 48,
+            borderRadius: theme.radii.iconCircle,
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+        },
+        icon: {
+            fontSize: 24,
+            lineHeight: 28,
+        },
+        colorIndicator: {
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            width: 12,
+            height: 12,
+            borderRadius: theme.radii.dot,
+            borderWidth: 2,
+            borderColor: theme.colors.surface.primary,
+        },
+        info: {
+            flex: 1,
+            gap: theme.spacing[0.5],
+        },
+        details: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: theme.spacing[1],
+            flexWrap: "wrap",
+        },
+        amount: {
+            ...theme.typography.amount,
+            minWidth: 80,
+            textAlign: "right",
+        },
+    }),
+);

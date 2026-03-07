@@ -17,53 +17,62 @@
  */
 
 // ─── Hooks ────────────────────────────────────────────────────────────────────
-export { useTheme, useColorScheme } from './hooks';
+export { useTheme, useColorScheme, createThemedStyles } from "./hooks";
 
 // ─── Primitive Components ─────────────────────────────────────────────────────
-export { Text, View, Button, Card, Icon, Modal, Badge, useModalFormStyles } from './components';
+export {
+    Text,
+    View,
+    Button,
+    Card,
+    Icon,
+    Modal,
+    Badge,
+    useModalFormStyles,
+} from "./components";
 export type {
-  DSTextProps,
-  TextColorKey,
-  DSViewProps,
-  ButtonProps,
-  ButtonVariant,
-  ButtonSize,
-  CardProps,
-  IconProps,
-  ModalProps,
-  BadgeProps,
-  BadgeVariant,
-  BadgeSize,
-} from './components';
+    DSTextProps,
+    TextColorKey,
+    DSViewProps,
+    ButtonProps,
+    ButtonVariant,
+    ButtonSize,
+    CardProps,
+    IconProps,
+    ModalProps,
+    BadgeProps,
+    BadgeVariant,
+    BadgeSize,
+} from "./components";
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
 // Exported for the rare cases where a token value is needed outside a component
 // (e.g. passing a color to a third-party charting library like react-native-gifted-charts).
-export { semanticColors, categoryColors } from './tokens/colors';
-export { spacing } from './tokens/spacing';
-export { radii } from './tokens/radii';
-export { shadows, buildColoredShadow } from './tokens/shadows';
-export { typographyVariants, fontFamilies } from './tokens/typography';
+export { semanticColors, categoryColors } from "./tokens/colors";
+export { spacing } from "./tokens/spacing";
+export { radii } from "./tokens/radii";
+export { shadows, buildColoredShadow } from "./tokens/shadows";
+export { typographyVariants, fontFamilies } from "./tokens/typography";
 export type {
-  RadiusKey,
-  SpacingToken,
-  SpacingValue,
-  ShadowLevel,
-  TypographyVariant,
-} from './tokens';
+    RadiusKey,
+    SpacingToken,
+    SpacingValue,
+    ShadowLevel,
+    TypographyVariant,
+} from "./tokens";
 
 // ─── Theme types ──────────────────────────────────────────────────────────────
 export type {
-  Theme,
-  ColorScheme,
-  ThemeColors,
-  ThemeBrandColors,
-  ThemeStatusColors,
-  ThemeTextColors,
-  ThemeSurfaceColors,
-  ThemeBorderColors,
-  ThemeIconColors,
-  ThemeInteractiveColors,
-  ThemeInteractiveVariant,
-  ThemeTabColors,
-} from './theme';
+    Theme,
+    ColorScheme,
+    ThemeColors,
+    ThemeBrandColors,
+    ThemeStatusColors,
+    ThemeTextColors,
+    ThemeSurfaceColors,
+    ThemeBorderColors,
+    ThemeIconColors,
+    ThemeInteractiveColors,
+    ThemeInteractiveVariant,
+    ThemeTabColors,
+} from "./theme";
