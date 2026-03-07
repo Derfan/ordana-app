@@ -1,9 +1,18 @@
-import { useState } from "react";
-import { Alert, Pressable, StyleSheet, TextInput } from "react-native";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import {
+    Alert,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View as RNView,
+} from "react-native";
+import { z } from "zod";
 
 import { BaseModal } from "@components/ui/base-modal";
 import {
     Button,
+    FormField,
     Text,
     View,
     createThemedStyles,
@@ -12,12 +21,18 @@ import {
 } from "@shared/design-system";
 import type { CategoryType, NewCategory } from "@db/repositories";
 
-interface AddCategoryModalProps {
-    visible: boolean;
-    onClose: () => void;
-    onSubmit: (data: NewCategory) => Promise<void>;
-    defaultType?: CategoryType;
-}
+// ─── Schema ───────────────────────────────────────────────────────────────────
+
+const schema = z.object({
+    name: z.string().min(1, "Name is required").max(50, "Max 50 characters"),
+    type: z.enum(["expense", "income"]),
+    iconIndex: z.number().int().min(0),
+    colorIndex: z.number().int().min(0),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const CATEGORY_ICONS = [
     "🍔",
@@ -71,55 +86,62 @@ const CATEGORY_COLORS = [
     "#f59e0b",
 ];
 
+// ─── Props ────────────────────────────────────────────────────────────────────
+
+interface AddCategoryModalProps {
+    visible: boolean;
+    onClose: () => void;
+    onSubmit: (data: NewCategory) => Promise<void>;
+    defaultType?: CategoryType;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function AddCategoryModal({
     visible,
     onClose,
     onSubmit,
     defaultType = "expense",
 }: AddCategoryModalProps) {
-    const [name, setName] = useState("");
-    const [type, setType] = useState<CategoryType>(defaultType);
-    const [selectedIcon, setSelectedIcon] = useState(0);
-    const [selectedColor, setSelectedColor] = useState(0);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const styles = useStyles();
     const formStyles = useModalFormStyles();
     const theme = useTheme();
 
+    const {
+        control,
+        handleSubmit,
+        watch,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<FormValues>({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            name: "",
+            type: defaultType,
+            iconIndex: 0,
+            colorIndex: 0,
+        },
+    });
+
+    const watchedNameLength = watch("name").length;
+
     const handleClose = () => {
         if (!isSubmitting) {
-            resetForm();
+            reset();
             onClose();
         }
     };
 
-    const resetForm = () => {
-        setName("");
-        setType(defaultType);
-        setSelectedIcon(0);
-        setSelectedColor(0);
-    };
-
-    const handleSubmit = async () => {
-        const trimmedName = name.trim();
-
-        if (!trimmedName) {
-            Alert.alert("Error", "Please enter a category name");
-            return;
-        }
-
-        setIsSubmitting(true);
+    const onValid = async (values: FormValues) => {
         try {
             await onSubmit({
-                name: trimmedName,
-                type,
-                icon: CATEGORY_ICONS[selectedIcon],
-                color: CATEGORY_COLORS[selectedColor],
+                name: values.name.trim(),
+                type: values.type,
+                icon: CATEGORY_ICONS[values.iconIndex],
+                color: CATEGORY_COLORS[values.colorIndex],
                 isSystem: false,
             });
-
-            resetForm();
+            reset();
             onClose();
         } catch (err) {
             Alert.alert(
@@ -128,8 +150,6 @@ export function AddCategoryModal({
                     ? err.message
                     : "Failed to create category",
             );
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -141,125 +161,153 @@ export function AddCategoryModal({
             isSubmitting={isSubmitting}
         >
             {/* Type */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Type
-                </Text>
-                <View colorValue="transparent" style={formStyles.typeButtons}>
-                    <Pressable
-                        onPress={() => setType("expense")}
-                        style={[
-                            formStyles.typeButton,
-                            type === "expense" &&
-                                formStyles.typeButtonActiveExpense,
-                        ]}
-                    >
-                        <Text
-                            style={[
-                                formStyles.typeButtonText,
-                                type === "expense" &&
-                                    formStyles.typeButtonTextActive,
-                            ]}
-                        >
-                            Expenses
-                        </Text>
-                    </Pressable>
+            <Controller
+                control={control}
+                name="type"
+                render={({ field: { value, onChange } }) => (
+                    <FormField label="Type">
+                        <RNView style={formStyles.typeButtons}>
+                            <Pressable
+                                onPress={() => onChange("expense")}
+                                style={[
+                                    formStyles.typeButton,
+                                    value === "expense" &&
+                                        formStyles.typeButtonActiveExpense,
+                                ]}
+                                accessibilityRole="button"
+                                accessibilityState={{
+                                    selected: value === "expense",
+                                }}
+                            >
+                                <Text
+                                    style={[
+                                        formStyles.typeButtonText,
+                                        value === "expense" &&
+                                            formStyles.typeButtonTextActive,
+                                    ]}
+                                >
+                                    Expenses
+                                </Text>
+                            </Pressable>
 
-                    <Pressable
-                        onPress={() => setType("income")}
-                        style={[
-                            formStyles.typeButton,
-                            type === "income" &&
-                                formStyles.typeButtonActiveIncome,
-                        ]}
-                    >
-                        <Text
-                            style={[
-                                formStyles.typeButtonText,
-                                type === "income" &&
-                                    formStyles.typeButtonTextActive,
-                            ]}
-                        >
-                            Income
-                        </Text>
-                    </Pressable>
-                </View>
-            </View>
+                            <Pressable
+                                onPress={() => onChange("income")}
+                                style={[
+                                    formStyles.typeButton,
+                                    value === "income" &&
+                                        formStyles.typeButtonActiveIncome,
+                                ]}
+                                accessibilityRole="button"
+                                accessibilityState={{
+                                    selected: value === "income",
+                                }}
+                            >
+                                <Text
+                                    style={[
+                                        formStyles.typeButtonText,
+                                        value === "income" &&
+                                            formStyles.typeButtonTextActive,
+                                    ]}
+                                >
+                                    Income
+                                </Text>
+                            </Pressable>
+                        </RNView>
+                    </FormField>
+                )}
+            />
 
             {/* Name */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Name *
-                </Text>
-                <TextInput
-                    style={formStyles.input}
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="e.g., Groceries"
-                    placeholderTextColor={theme.colors.text.placeholder}
-                    maxLength={50}
-                    autoFocus
-                    editable={!isSubmitting}
-                />
-                <Text style={formStyles.hint}>{name.length}/50 characters</Text>
-            </View>
-
-            {/* Icon picker */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Icon
-                </Text>
-                <View colorValue="transparent" style={styles.iconsGrid}>
-                    {CATEGORY_ICONS.map((icon, index) => (
-                        <Pressable
-                            key={index}
-                            onPress={() => setSelectedIcon(index)}
+            <Controller
+                control={control}
+                name="name"
+                render={({ field: { value, onChange, onBlur } }) => (
+                    <FormField
+                        label="Name"
+                        required
+                        error={errors.name?.message}
+                        hint={`${watchedNameLength}/50 characters`}
+                    >
+                        <TextInput
                             style={[
-                                styles.iconButton,
-                                selectedIcon === index &&
-                                    styles.iconButtonActive,
+                                formStyles.input,
+                                !!errors.name && styles.inputError,
                             ]}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Select icon ${icon}`}
-                            accessibilityState={{
-                                selected: selectedIcon === index,
-                            }}
-                        >
-                            <Text style={styles.iconText}>{icon}</Text>
-                        </Pressable>
-                    ))}
-                </View>
-            </View>
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            placeholder="e.g., Groceries"
+                            placeholderTextColor={theme.colors.text.placeholder}
+                            maxLength={50}
+                            autoFocus
+                            editable={!isSubmitting}
+                        />
+                    </FormField>
+                )}
+            />
 
-            {/* Color picker */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Color
-                </Text>
-                <View colorValue="transparent" style={styles.colorsGrid}>
-                    {CATEGORY_COLORS.map((color, index) => (
-                        <Pressable
-                            key={index}
-                            onPress={() => setSelectedColor(index)}
-                            style={[
-                                styles.colorButton,
-                                { backgroundColor: color },
-                                selectedColor === index &&
-                                    styles.colorButtonActive,
-                            ]}
-                            accessibilityRole="button"
-                            accessibilityLabel={`Select color ${color}`}
-                            accessibilityState={{
-                                selected: selectedColor === index,
-                            }}
-                        >
-                            {selectedColor === index && (
-                                <Text style={styles.colorCheck}>✓</Text>
-                            )}
-                        </Pressable>
-                    ))}
-                </View>
-            </View>
+            {/* Icon */}
+            <Controller
+                control={control}
+                name="iconIndex"
+                render={({ field: { value, onChange } }) => (
+                    <FormField label="Icon">
+                        <RNView style={styles.iconsGrid}>
+                            {CATEGORY_ICONS.map((icon, index) => (
+                                <Pressable
+                                    key={index}
+                                    onPress={() => onChange(index)}
+                                    style={[
+                                        styles.iconButton,
+                                        value === index &&
+                                            styles.iconButtonActive,
+                                    ]}
+                                    accessibilityRole="button"
+                                    accessibilityLabel={`Select icon ${icon}`}
+                                    accessibilityState={{
+                                        selected: value === index,
+                                    }}
+                                >
+                                    <Text style={styles.iconText}>{icon}</Text>
+                                </Pressable>
+                            ))}
+                        </RNView>
+                    </FormField>
+                )}
+            />
+
+            {/* Color */}
+            <Controller
+                control={control}
+                name="colorIndex"
+                render={({ field: { value, onChange } }) => (
+                    <FormField label="Color">
+                        <RNView style={styles.colorsGrid}>
+                            {CATEGORY_COLORS.map((color, index) => (
+                                <Pressable
+                                    key={index}
+                                    onPress={() => onChange(index)}
+                                    style={[
+                                        styles.colorButton,
+                                        { backgroundColor: color },
+                                        value === index &&
+                                            styles.colorButtonActive,
+                                    ]}
+                                    accessibilityRole="button"
+                                    accessibilityLabel={`Select color ${color}`}
+                                    accessibilityState={{
+                                        selected: value === index,
+                                    }}
+                                >
+                                    {value === index && (
+                                        <Text style={styles.colorCheck}>✓</Text>
+                                    )}
+                                </Pressable>
+                            ))}
+                        </RNView>
+                    </FormField>
+                )}
+            />
 
             {/* Submit */}
             <View colorValue="transparent" style={styles.submitButton}>
@@ -269,15 +317,20 @@ export function AddCategoryModal({
                     label={isSubmitting ? "Creating..." : "Create"}
                     disabled={isSubmitting}
                     loading={isSubmitting}
-                    onPress={handleSubmit}
+                    onPress={handleSubmit(onValid)}
                 />
             </View>
         </BaseModal>
     );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
+        inputError: {
+            borderColor: theme.colors.status.error,
+        },
         iconsGrid: {
             flexDirection: "row",
             flexWrap: "wrap",

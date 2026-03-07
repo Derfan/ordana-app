@@ -1,22 +1,38 @@
-import { useState } from "react";
-import { Alert, Pressable, StyleSheet, TextInput } from "react-native";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import {
+    Alert,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View as RNView,
+} from "react-native";
+import { z } from "zod";
 
+import { BaseModal } from "@components/ui/base-modal";
 import {
     Button,
+    FormField,
     Text,
-    View,
     createThemedStyles,
     useModalFormStyles,
     useTheme,
 } from "@shared/design-system";
-import { BaseModal } from "@components/ui/base-modal";
 import type { NewAccount } from "@db/repositories";
 
-interface AddAccountModalProps {
-    visible: boolean;
-    onClose: () => void;
-    onSubmit: (data: NewAccount) => Promise<void>;
-}
+// ─── Schema ───────────────────────────────────────────────────────────────────
+
+const schema = z.object({
+    typeIndex: z.number().int().min(0),
+    name: z.string().min(1, "Name is required").max(100, "Max 100 characters"),
+    balance: z.string().refine((v) => v === "" || !isNaN(parseFloat(v)), {
+        message: "Enter a valid number",
+    }),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const ACCOUNT_TYPES = [
     { label: "Card", icon: "💳" },
@@ -25,73 +41,81 @@ const ACCOUNT_TYPES = [
     { label: "Credit", icon: "💰" },
 ];
 
+// ─── Props ────────────────────────────────────────────────────────────────────
+
+interface AddAccountModalProps {
+    visible: boolean;
+    onClose: () => void;
+    onSubmit: (data: NewAccount) => Promise<void>;
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function AddAccountModal({
     visible,
     onClose,
     onSubmit,
 }: AddAccountModalProps) {
-    const [name, setName] = useState("");
-    const [balance, setBalance] = useState("0");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [selectedType, setSelectedType] = useState(0);
-
     const styles = useStyles();
     const formStyles = useModalFormStyles();
     const theme = useTheme();
 
+    const {
+        control,
+        handleSubmit,
+        watch,
+        setValue,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<FormValues>({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            typeIndex: 0,
+            name: ACCOUNT_TYPES[0].label,
+            balance: "0",
+        },
+    });
+
+    const watchedTypeIndex = watch("typeIndex");
+    const watchedName = watch("name");
+
     const handleClose = () => {
         if (!isSubmitting) {
-            resetForm();
+            reset();
             onClose();
         }
-    };
-
-    const resetForm = () => {
-        setName("");
-        setBalance("0");
-        setSelectedType(0);
-    };
-
-    const handleSubmit = async () => {
-        const trimmedName = name.trim();
-
-        if (!trimmedName) {
-            Alert.alert("Error", "Please enter an account name");
-            return;
-        }
-
-        const parsedBalance = parseFloat(balance) || 0;
-
-        setIsSubmitting(true);
-        try {
-            await onSubmit({
-                name: trimmedName,
-                balance: Math.round(parsedBalance * 100),
-            });
-
-            resetForm();
-            onClose();
-        } catch (error) {
-            Alert.alert(
-                "Error",
-                error instanceof Error
-                    ? error.message
-                    : "Failed to create account",
-            );
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleBalanceChange = (text: string) => {
-        const cleaned = text.replace(/[^0-9.-]/g, "");
-        setBalance(cleaned);
     };
 
     const handleTypeSelect = (index: number) => {
-        setSelectedType(index);
-        if (!name.trim()) {
-            setName(ACCOUNT_TYPES[index].label);
+        setValue("typeIndex", index, { shouldValidate: false });
+        // Pre-fill name only if user hasn't changed it from a previous type label
+        const currentName = watchedName.trim();
+        const isStillDefault = ACCOUNT_TYPES.some(
+            (t) => t.label === currentName,
+        );
+
+        if (!currentName || isStillDefault) {
+            setValue("name", ACCOUNT_TYPES[index].label, {
+                shouldValidate: false,
+            });
+        }
+    };
+
+    const onValid = async (values: FormValues) => {
+        const parsedBalance = parseFloat(values.balance ?? "0") || 0;
+
+        try {
+            await onSubmit({
+                name: values.name.trim(),
+                balance: Math.round(parsedBalance * 100),
+            });
+            reset();
+            onClose();
+        } catch (err) {
+            Alert.alert(
+                "Error",
+                err instanceof Error ? err.message : "Failed to create account",
+            );
         }
     };
 
@@ -102,30 +126,28 @@ export function AddAccountModal({
             onClose={handleClose}
             isSubmitting={isSubmitting}
         >
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Account Type
-                </Text>
-                <View colorValue="transparent" style={styles.typeGrid}>
+            {/* Account Type */}
+            <FormField label="Account Type">
+                <RNView style={styles.typeGrid}>
                     {ACCOUNT_TYPES.map((type, index) => (
                         <Pressable
                             key={index}
                             onPress={() => handleTypeSelect(index)}
                             style={[
                                 styles.typeButton,
-                                selectedType === index &&
+                                watchedTypeIndex === index &&
                                     styles.typeButtonActive,
                             ]}
                             accessibilityRole="button"
                             accessibilityState={{
-                                selected: selectedType === index,
+                                selected: watchedTypeIndex === index,
                             }}
                         >
                             <Text style={styles.typeIcon}>{type.icon}</Text>
                             <Text
                                 style={[
                                     styles.typeLabel,
-                                    selectedType === index &&
+                                    watchedTypeIndex === index &&
                                         styles.typeLabelActive,
                                 ]}
                             >
@@ -133,65 +155,88 @@ export function AddAccountModal({
                             </Text>
                         </Pressable>
                     ))}
-                </View>
-            </View>
+                </RNView>
+            </FormField>
 
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Name *
-                </Text>
-                <TextInput
-                    style={formStyles.input}
-                    value={name}
-                    onChangeText={setName}
-                    placeholder="e.g., Main Card"
-                    placeholderTextColor={theme.colors.text.placeholder}
-                    maxLength={100}
-                    autoFocus
-                    editable={!isSubmitting}
-                />
-                <Text style={formStyles.hint}>
-                    {name.length}/100 characters
-                </Text>
-            </View>
+            {/* Name */}
+            <Controller
+                control={control}
+                name="name"
+                render={({ field: { value, onChange, onBlur } }) => (
+                    <FormField
+                        label="Name"
+                        required
+                        error={errors.name?.message}
+                        hint={`${value.length}/100 characters`}
+                    >
+                        <TextInput
+                            style={[
+                                formStyles.input,
+                                !!errors.name && styles.inputError,
+                            ]}
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            placeholder="e.g., Main Card"
+                            placeholderTextColor={theme.colors.text.placeholder}
+                            maxLength={100}
+                            autoFocus
+                            editable={!isSubmitting}
+                        />
+                    </FormField>
+                )}
+            />
 
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Initial Balance
-                </Text>
-                <View
-                    colorValue="transparent"
-                    style={styles.balanceInputWrapper}
-                >
-                    <TextInput
-                        style={formStyles.input}
-                        value={balance}
-                        onChangeText={handleBalanceChange}
-                        placeholder="0"
-                        placeholderTextColor={theme.colors.text.placeholder}
-                        keyboardType="numeric"
-                        editable={!isSubmitting}
-                    />
-                    <Text style={styles.currencySymbol}>€</Text>
-                </View>
-                <Text style={formStyles.hint}>
-                    Enter the current account balance
-                </Text>
-            </View>
+            {/* Initial Balance */}
+            <Controller
+                control={control}
+                name="balance"
+                render={({ field: { value, onChange, onBlur } }) => (
+                    <FormField
+                        label="Initial Balance"
+                        error={errors.balance?.message}
+                        hint="Enter the current account balance"
+                    >
+                        <RNView style={styles.balanceInputWrapper}>
+                            <TextInput
+                                style={[
+                                    formStyles.input,
+                                    !!errors.balance && styles.inputError,
+                                ]}
+                                value={value}
+                                onChangeText={(text) =>
+                                    onChange(text.replace(/[^0-9.-]/g, ""))
+                                }
+                                onBlur={onBlur}
+                                placeholder="0"
+                                placeholderTextColor={
+                                    theme.colors.text.placeholder
+                                }
+                                keyboardType="numeric"
+                                editable={!isSubmitting}
+                            />
+                            <Text style={styles.currencySymbol}>€</Text>
+                        </RNView>
+                    </FormField>
+                )}
+            />
 
-            <View colorValue="transparent" style={styles.submitButton}>
+            {/* Submit */}
+            <RNView style={styles.submitButton}>
                 <Button
                     variant="primary"
                     size="lg"
-                    label={isSubmitting ? "Creating..." : "Create"}
+                    label="Create"
                     disabled={isSubmitting}
                     loading={isSubmitting}
-                    onPress={handleSubmit}
+                    onPress={handleSubmit(onValid)}
                 />
-            </View>
+            </RNView>
         </BaseModal>
     );
 }
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
@@ -235,6 +280,9 @@ const useStyles = createThemedStyles((theme) =>
             top: theme.spacing[3],
             ...theme.typography.body,
             color: theme.colors.text.muted,
+        },
+        inputError: {
+            borderColor: theme.colors.status.error,
         },
         submitButton: {
             marginTop: theme.spacing[4],

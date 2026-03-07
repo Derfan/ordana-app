@@ -28,6 +28,7 @@ export {
     Icon,
     Modal,
     Badge,
+    FormField,
     useModalFormStyles,
 } from "./components";
 export type {
@@ -43,6 +44,7 @@ export type {
     BadgeProps,
     BadgeVariant,
     BadgeSize,
+    FormFieldProps,
 } from "./components";
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────

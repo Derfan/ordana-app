@@ -1,15 +1,18 @@
-import { useState } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
 import {
-    Alert,
     Pressable,
     ScrollView,
     StyleSheet,
     TextInput,
+    Alert,
 } from "react-native";
+import { z } from "zod";
 
 import { BaseModal } from "@components/ui/base-modal";
 import {
     Button,
+    FormField,
     Text,
     View,
     createThemedStyles,
@@ -20,6 +23,29 @@ import type { CategoryType, NewTransaction } from "@db/repositories";
 import { useAccounts } from "@hooks/use-accounts";
 import { useCategories } from "@hooks/use-categories";
 
+// ─── Schema ───────────────────────────────────────────────────────────────────
+
+const schema = z.object({
+    type: z.enum(["expense", "income"]),
+    amount: z
+        .string()
+        .min(1, "Amount is required")
+        .refine(
+            (v) => {
+                const n = parseFloat(v);
+                return !isNaN(n) && n > 0;
+            },
+            { message: "Enter a valid amount greater than 0" },
+        ),
+    accountId: z.number().int().positive("Please select an account"),
+    categoryId: z.number().int().positive("Please select a category"),
+    description: z.string().max(500).optional(),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+// ─── Props ────────────────────────────────────────────────────────────────────
+
 interface AddTransactionModalProps {
     visible: boolean;
     onClose: () => void;
@@ -27,24 +53,14 @@ interface AddTransactionModalProps {
     defaultType?: CategoryType;
 }
 
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function AddTransactionModal({
     visible,
     onClose,
     onSubmit,
     defaultType = "expense",
 }: AddTransactionModalProps) {
-    const [type, setType] = useState<CategoryType>(defaultType);
-    const [amount, setAmount] = useState("");
-    const [selectedAccountId, setSelectedAccountId] = useState<number | null>(
-        null,
-    );
-    const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
-        null,
-    );
-    const [description, setDescription] = useState("");
-    const [date, setDate] = useState(new Date());
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const styles = useStyles();
     const formStyles = useModalFormStyles();
     const theme = useTheme();
@@ -52,62 +68,54 @@ export function AddTransactionModal({
     const { accounts } = useAccounts();
     const { incomeCategories, expenseCategories } = useCategories();
 
+    const {
+        control,
+        handleSubmit,
+        watch,
+        setValue,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<FormValues>({
+        resolver: zodResolver(schema),
+        defaultValues: {
+            type: defaultType,
+            amount: "",
+            description: "",
+        },
+    });
+
+    const type = watch("type");
+    const selectedAccountId = watch("accountId");
+    const selectedCategoryId = watch("categoryId");
+    const description = watch("description") ?? "";
+
     const currentCategories =
         type === "income" ? incomeCategories : expenseCategories;
 
+    const handleTypeChange = (newType: CategoryType) => {
+        setValue("type", newType, { shouldValidate: false });
+        // Reset category when switching type — previous selection is invalid
+        setValue("categoryId", undefined as any, { shouldValidate: false });
+    };
+
     const handleClose = () => {
         if (!isSubmitting) {
-            resetForm();
+            reset();
             onClose();
         }
     };
 
-    const resetForm = () => {
-        setType(defaultType);
-        setAmount("");
-        setSelectedAccountId(null);
-        setSelectedCategoryId(null);
-        setDescription("");
-        setDate(new Date());
-    };
-
-    const handleTypeChange = (newType: CategoryType) => {
-        setType(newType);
-        setSelectedCategoryId(null);
-    };
-
-    const handleSubmit = async () => {
-        const numAmount = parseFloat(amount);
-
-        if (!amount || isNaN(numAmount) || numAmount <= 0) {
-            Alert.alert("Error", "Please enter a valid amount");
-            return;
-        }
-
-        if (!selectedAccountId) {
-            Alert.alert("Error", "Please select an account");
-            return;
-        }
-
-        if (!selectedCategoryId) {
-            Alert.alert("Error", "Please select a category");
-            return;
-        }
-
-        setIsSubmitting(true);
+    const onValid = async (values: FormValues) => {
         try {
-            const amountInCents = Math.round(numAmount * 100);
-
             await onSubmit({
-                type,
-                amount: amountInCents,
-                accountId: selectedAccountId,
-                categoryId: selectedCategoryId,
-                description: description.trim() || undefined,
-                date,
+                type: values.type,
+                amount: Math.round(parseFloat(values.amount) * 100),
+                accountId: values.accountId,
+                categoryId: values.categoryId,
+                description: values.description?.trim() || undefined,
+                date: new Date(),
             });
-
-            resetForm();
+            reset();
             onClose();
         } catch (err) {
             Alert.alert(
@@ -116,8 +124,6 @@ export function AddTransactionModal({
                     ? err.message
                     : "Failed to create transaction",
             );
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -129,10 +135,7 @@ export function AddTransactionModal({
             isSubmitting={isSubmitting}
         >
             {/* Type */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Type
-                </Text>
+            <FormField label="Type">
                 <View colorValue="transparent" style={formStyles.typeButtons}>
                     <Pressable
                         onPress={() => handleTypeChange("expense")}
@@ -176,35 +179,45 @@ export function AddTransactionModal({
                         </Text>
                     </Pressable>
                 </View>
-            </View>
+            </FormField>
 
             {/* Amount */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Amount *
-                </Text>
-                <View
-                    colorValue="transparent"
-                    style={styles.amountInputContainer}
-                >
-                    <Text style={styles.currencySymbol}>€</Text>
-                    <TextInput
-                        style={styles.amountInput}
-                        value={amount}
-                        onChangeText={setAmount}
-                        placeholder="0.00"
-                        placeholderTextColor={theme.colors.text.placeholder}
-                        keyboardType="decimal-pad"
-                        editable={!isSubmitting}
-                    />
-                </View>
-            </View>
+            <FormField label="Amount" required error={errors.amount?.message}>
+                <Controller
+                    control={control}
+                    name="amount"
+                    render={({ field: { value, onChange, onBlur } }) => (
+                        <View
+                            colorValue="transparent"
+                            style={[
+                                styles.amountInputContainer,
+                                !!errors.amount && styles.inputError,
+                            ]}
+                        >
+                            <Text style={styles.currencySymbol}>€</Text>
+                            <TextInput
+                                style={styles.amountInput}
+                                value={value}
+                                onChangeText={onChange}
+                                onBlur={onBlur}
+                                placeholder="0.00"
+                                placeholderTextColor={
+                                    theme.colors.text.placeholder
+                                }
+                                keyboardType="decimal-pad"
+                                editable={!isSubmitting}
+                            />
+                        </View>
+                    )}
+                />
+            </FormField>
 
             {/* Account */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Account *
-                </Text>
+            <FormField
+                label="Account"
+                required
+                error={errors.accountId?.message}
+            >
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View
                         colorValue="transparent"
@@ -219,7 +232,9 @@ export function AddTransactionModal({
                                 <Pressable
                                     key={account.id}
                                     onPress={() =>
-                                        setSelectedAccountId(account.id)
+                                        setValue("accountId", account.id, {
+                                            shouldValidate: true,
+                                        })
                                     }
                                     style={[
                                         styles.optionButton,
@@ -246,13 +261,14 @@ export function AddTransactionModal({
                         )}
                     </View>
                 </ScrollView>
-            </View>
+            </FormField>
 
             {/* Category */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Category *
-                </Text>
+            <FormField
+                label="Category"
+                required
+                error={errors.categoryId?.message}
+            >
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View
                         colorValue="transparent"
@@ -267,7 +283,9 @@ export function AddTransactionModal({
                                 <Pressable
                                     key={category.id}
                                     onPress={() =>
-                                        setSelectedCategoryId(category.id)
+                                        setValue("categoryId", category.id, {
+                                            shouldValidate: true,
+                                        })
                                     }
                                     style={[
                                         styles.categoryButton,
@@ -301,58 +319,62 @@ export function AddTransactionModal({
                         )}
                     </View>
                 </ScrollView>
-            </View>
+            </FormField>
 
             {/* Description */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Description (optional)
-                </Text>
-                <TextInput
-                    style={[formStyles.input, styles.descriptionInput]}
-                    value={description}
-                    onChangeText={setDescription}
-                    placeholder="Add a note..."
-                    placeholderTextColor={theme.colors.text.placeholder}
-                    maxLength={500}
-                    multiline
-                    numberOfLines={3}
-                    editable={!isSubmitting}
+            <FormField
+                label="Description"
+                hint={`${description.length}/500 characters`}
+                error={errors.description?.message}
+            >
+                <Controller
+                    control={control}
+                    name="description"
+                    render={({ field: { value, onChange, onBlur } }) => (
+                        <TextInput
+                            style={[formStyles.input, styles.descriptionInput]}
+                            value={value}
+                            onChangeText={onChange}
+                            onBlur={onBlur}
+                            placeholder="Add a note..."
+                            placeholderTextColor={theme.colors.text.placeholder}
+                            maxLength={500}
+                            multiline
+                            numberOfLines={3}
+                            editable={!isSubmitting}
+                        />
+                    )}
                 />
-                <Text style={formStyles.hint}>
-                    {description.length}/500 characters
-                </Text>
-            </View>
+            </FormField>
 
-            {/* Date */}
-            <View colorValue="transparent" style={formStyles.section}>
-                <Text variant="label" style={formStyles.label}>
-                    Date
-                </Text>
+            {/* Date — display only, defaults to today */}
+            <FormField label="Date">
                 <Text style={styles.dateText}>
-                    {date.toLocaleDateString("en-US", {
+                    {new Date().toLocaleDateString("en-US", {
                         weekday: "short",
                         year: "numeric",
                         month: "short",
                         day: "numeric",
                     })}
                 </Text>
-            </View>
+            </FormField>
 
             {/* Submit */}
             <View colorValue="transparent" style={styles.submitButton}>
                 <Button
                     variant="primary"
                     size="lg"
-                    label={isSubmitting ? "Creating..." : "Create"}
+                    label="Create"
                     disabled={isSubmitting}
                     loading={isSubmitting}
-                    onPress={handleSubmit}
+                    onPress={handleSubmit(onValid)}
                 />
             </View>
         </BaseModal>
     );
 }
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
@@ -364,6 +386,9 @@ const useStyles = createThemedStyles((theme) =>
             borderRadius: theme.radii.sm,
             paddingHorizontal: theme.spacing[3],
             backgroundColor: theme.colors.surface.primary,
+        },
+        inputError: {
+            borderColor: theme.colors.status.error,
         },
         currencySymbol: {
             ...theme.typography.amountInput,
