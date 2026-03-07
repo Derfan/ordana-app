@@ -1,16 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { forwardRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-    Alert,
-    Pressable,
-    StyleSheet,
-    TextInput,
-    View as RNView,
-} from "react-native";
+import { Alert, Pressable, StyleSheet, View as RNView } from "react-native";
 import { z } from "zod";
 
-import { BaseModal } from "@components/ui/base-modal";
 import {
+    AppBottomSheet,
+    type AppBottomSheetHandle,
     Button,
     FormField,
     Text,
@@ -18,7 +15,7 @@ import {
     useModalFormStyles,
     useTheme,
 } from "@shared/design-system";
-import type { NewAccount } from "@db/repositories";
+import { useAccounts } from "@hooks/use-accounts";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -41,200 +38,202 @@ const ACCOUNT_TYPES = [
     { label: "Credit", icon: "💰" },
 ];
 
-// ─── Props ────────────────────────────────────────────────────────────────────
-
-interface AddAccountModalProps {
-    visible: boolean;
-    onClose: () => void;
-    onSubmit: (data: NewAccount) => Promise<void>;
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function AddAccountModal({
-    visible,
-    onClose,
-    onSubmit,
-}: AddAccountModalProps) {
-    const styles = useStyles();
-    const formStyles = useModalFormStyles();
-    const theme = useTheme();
+export const AddAccountModal = forwardRef<AppBottomSheetHandle>(
+    function AddAccountModal(_props, ref) {
+        const styles = useStyles();
+        const formStyles = useModalFormStyles();
+        const theme = useTheme();
 
-    const {
-        control,
-        handleSubmit,
-        watch,
-        setValue,
-        reset,
-        formState: { errors, isSubmitting },
-    } = useForm<FormValues>({
-        resolver: zodResolver(schema),
-        defaultValues: {
-            typeIndex: 0,
-            name: ACCOUNT_TYPES[0].label,
-            balance: "0",
-        },
-    });
+        const { addAccount } = useAccounts();
 
-    const watchedTypeIndex = watch("typeIndex");
-    const watchedName = watch("name");
+        const {
+            control,
+            handleSubmit,
+            watch,
+            setValue,
+            reset,
+            formState: { errors, isSubmitting },
+        } = useForm<FormValues>({
+            resolver: zodResolver(schema),
+            defaultValues: {
+                typeIndex: 0,
+                name: ACCOUNT_TYPES[0].label,
+                balance: "0",
+            },
+        });
 
-    const handleClose = () => {
-        if (!isSubmitting) {
+        const watchedTypeIndex = watch("typeIndex");
+        const watchedName = watch("name");
+
+        // Reset form each time the sheet is fully dismissed so stale data
+        // never shows when it is opened again.
+        const handleDismiss = () => {
             reset();
-            onClose();
-        }
-    };
+        };
 
-    const handleTypeSelect = (index: number) => {
-        setValue("typeIndex", index, { shouldValidate: false });
-        // Pre-fill name only if user hasn't changed it from a previous type label
-        const currentName = watchedName.trim();
-        const isStillDefault = ACCOUNT_TYPES.some(
-            (t) => t.label === currentName,
-        );
-
-        if (!currentName || isStillDefault) {
-            setValue("name", ACCOUNT_TYPES[index].label, {
-                shouldValidate: false,
-            });
-        }
-    };
-
-    const onValid = async (values: FormValues) => {
-        const parsedBalance = parseFloat(values.balance ?? "0") || 0;
-
-        try {
-            await onSubmit({
-                name: values.name.trim(),
-                balance: Math.round(parsedBalance * 100),
-            });
-            reset();
-            onClose();
-        } catch (err) {
-            Alert.alert(
-                "Error",
-                err instanceof Error ? err.message : "Failed to create account",
+        const handleTypeSelect = (index: number) => {
+            setValue("typeIndex", index, { shouldValidate: false });
+            // Pre-fill name only if the current value is still one of the default type labels
+            const currentName = watchedName.trim();
+            const isStillDefault = ACCOUNT_TYPES.some(
+                (t) => t.label === currentName,
             );
-        }
-    };
 
-    return (
-        <BaseModal
-            visible={visible}
-            title="New Account"
-            onClose={handleClose}
-            isSubmitting={isSubmitting}
-        >
-            {/* Account Type */}
-            <FormField label="Account Type">
-                <RNView style={styles.typeGrid}>
-                    {ACCOUNT_TYPES.map((type, index) => (
-                        <Pressable
-                            key={index}
-                            onPress={() => handleTypeSelect(index)}
-                            style={[
-                                styles.typeButton,
-                                watchedTypeIndex === index &&
-                                    styles.typeButtonActive,
-                            ]}
-                            accessibilityRole="button"
-                            accessibilityState={{
-                                selected: watchedTypeIndex === index,
-                            }}
-                        >
-                            <Text style={styles.typeIcon}>{type.icon}</Text>
-                            <Text
+            if (!currentName || isStillDefault) {
+                setValue("name", ACCOUNT_TYPES[index].label, {
+                    shouldValidate: false,
+                });
+            }
+        };
+
+        const onValid = async (values: FormValues) => {
+            const parsedBalance = parseFloat(values.balance ?? "0") || 0;
+
+            try {
+                await addAccount({
+                    name: values.name.trim(),
+                    balance: Math.round(parsedBalance * 100),
+                });
+                reset();
+            } catch (err) {
+                Alert.alert(
+                    "Error",
+                    err instanceof Error
+                        ? err.message
+                        : "Failed to create account",
+                );
+            }
+        };
+
+        return (
+            <AppBottomSheet
+                ref={ref}
+                title="New Account"
+                isSubmitting={isSubmitting}
+                onDismiss={handleDismiss}
+            >
+                {/* Account Type */}
+                <FormField label="Account Type">
+                    <RNView style={styles.typeGrid}>
+                        {ACCOUNT_TYPES.map((type, index) => (
+                            <Pressable
+                                key={index}
+                                onPress={() => handleTypeSelect(index)}
                                 style={[
-                                    styles.typeLabel,
+                                    styles.typeButton,
                                     watchedTypeIndex === index &&
-                                        styles.typeLabelActive,
+                                        styles.typeButtonActive,
                                 ]}
+                                accessibilityRole="button"
+                                accessibilityState={{
+                                    selected: watchedTypeIndex === index,
+                                }}
                             >
-                                {type.label}
-                            </Text>
-                        </Pressable>
-                    ))}
-                </RNView>
-            </FormField>
+                                <Text style={styles.typeIcon}>{type.icon}</Text>
+                                <Text
+                                    style={[
+                                        styles.typeLabel,
+                                        watchedTypeIndex === index &&
+                                            styles.typeLabelActive,
+                                    ]}
+                                >
+                                    {type.label}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </RNView>
+                </FormField>
 
-            {/* Name */}
-            <Controller
-                control={control}
-                name="name"
-                render={({ field: { value, onChange, onBlur } }) => (
-                    <FormField
-                        label="Name"
-                        required
-                        error={errors.name?.message}
-                        hint={`${value.length}/100 characters`}
-                    >
-                        <TextInput
-                            style={[
-                                formStyles.input,
-                                !!errors.name && styles.inputError,
-                            ]}
-                            value={value}
-                            onChangeText={onChange}
-                            onBlur={onBlur}
-                            placeholder="e.g., Main Card"
-                            placeholderTextColor={theme.colors.text.placeholder}
-                            maxLength={100}
-                            autoFocus
-                            editable={!isSubmitting}
-                        />
-                    </FormField>
-                )}
-            />
-
-            {/* Initial Balance */}
-            <Controller
-                control={control}
-                name="balance"
-                render={({ field: { value, onChange, onBlur } }) => (
-                    <FormField
-                        label="Initial Balance"
-                        error={errors.balance?.message}
-                        hint="Enter the current account balance"
-                    >
-                        <RNView style={styles.balanceInputWrapper}>
-                            <TextInput
+                {/* Name */}
+                <Controller
+                    control={control}
+                    name="name"
+                    render={({ field: { value, onChange, onBlur } }) => (
+                        <FormField
+                            label="Name"
+                            required
+                            error={errors.name?.message}
+                            hint={`${value.length}/100 characters`}
+                        >
+                            {/*
+                             * BottomSheetTextInput registers this input with the sheet's
+                             * focus tracker so keyboardBehavior="extend" fires correctly.
+                             */}
+                            <BottomSheetTextInput
                                 style={[
                                     formStyles.input,
-                                    !!errors.balance && styles.inputError,
+                                    !!errors.name && styles.inputError,
                                 ]}
                                 value={value}
-                                onChangeText={(text) =>
-                                    onChange(text.replace(/[^0-9.-]/g, ""))
-                                }
+                                onChangeText={onChange}
                                 onBlur={onBlur}
-                                placeholder="0"
+                                placeholder="e.g., Main Card"
                                 placeholderTextColor={
                                     theme.colors.text.placeholder
                                 }
-                                keyboardType="numeric"
+                                maxLength={100}
+                                autoFocus
                                 editable={!isSubmitting}
                             />
-                            <Text style={styles.currencySymbol}>€</Text>
-                        </RNView>
-                    </FormField>
-                )}
-            />
-
-            {/* Submit */}
-            <RNView style={styles.submitButton}>
-                <Button
-                    variant="primary"
-                    size="lg"
-                    label="Create"
-                    disabled={isSubmitting}
-                    loading={isSubmitting}
-                    onPress={handleSubmit(onValid)}
+                        </FormField>
+                    )}
                 />
-            </RNView>
-        </BaseModal>
-    );
-}
+
+                {/* Initial Balance */}
+                <Controller
+                    control={control}
+                    name="balance"
+                    render={({ field: { value, onChange, onBlur } }) => (
+                        <FormField
+                            label="Initial Balance"
+                            error={errors.balance?.message}
+                            hint="Enter the current account balance"
+                        >
+                            <RNView style={styles.balanceInputWrapper}>
+                                {/*
+                                 * Also use BottomSheetTextInput here so the numeric
+                                 * keyboard causes the same sheet-extend behavior.
+                                 */}
+                                <BottomSheetTextInput
+                                    style={[
+                                        formStyles.input,
+                                        !!errors.balance && styles.inputError,
+                                    ]}
+                                    value={value}
+                                    onChangeText={(text) =>
+                                        onChange(text.replace(/[^0-9.-]/g, ""))
+                                    }
+                                    onBlur={onBlur}
+                                    placeholder="0"
+                                    placeholderTextColor={
+                                        theme.colors.text.placeholder
+                                    }
+                                    keyboardType="numeric"
+                                    editable={!isSubmitting}
+                                />
+                                <Text style={styles.currencySymbol}>€</Text>
+                            </RNView>
+                        </FormField>
+                    )}
+                />
+
+                {/* Submit */}
+                <RNView style={styles.submitButton}>
+                    <Button
+                        variant="primary"
+                        size="lg"
+                        label="Create"
+                        disabled={isSubmitting}
+                        loading={isSubmitting}
+                        onPress={handleSubmit(onValid)}
+                    />
+                </RNView>
+            </AppBottomSheet>
+        );
+    },
+);
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 

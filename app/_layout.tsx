@@ -3,10 +3,13 @@ import {
     DefaultTheme,
     ThemeProvider,
 } from "@react-navigation/native";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 import { ErrorBoundary } from "@components/error-boundary";
@@ -47,22 +50,35 @@ export default function RootLayout() {
     if (!success || !isSeeded) return null;
 
     return (
-        <ErrorBoundary>
-            <ThemeProvider
-                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
-                <Stack>
-                    <Stack.Screen
-                        name="(tabs)"
-                        options={{ headerShown: false }}
-                    />
-                    <Stack.Screen
-                        name="modal"
-                        options={{ presentation: "modal", title: "Modal" }}
-                    />
-                </Stack>
-                <StatusBar style="auto" />
-            </ThemeProvider>
-        </ErrorBoundary>
+        <GestureHandlerRootView style={styles.root}>
+            <ErrorBoundary>
+                <ThemeProvider
+                    value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+                >
+                    <BottomSheetModalProvider>
+                        <Stack>
+                            <Stack.Screen
+                                name="(tabs)"
+                                options={{ headerShown: false }}
+                            />
+                            <Stack.Screen
+                                name="modal"
+                                options={{
+                                    presentation: "modal",
+                                    title: "Modal",
+                                }}
+                            />
+                        </Stack>
+                        <StatusBar style="auto" />
+                    </BottomSheetModalProvider>
+                </ThemeProvider>
+            </ErrorBoundary>
+        </GestureHandlerRootView>
     );
 }
+
+const styles = StyleSheet.create({
+    root: {
+        flex: 1,
+    },
+});

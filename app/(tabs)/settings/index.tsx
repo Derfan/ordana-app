@@ -1,45 +1,20 @@
-import { Link } from "expo-router";
-import { Pressable, StyleSheet, View as RNView } from "react-native";
+import { Link, type Href } from "expo-router";
+import { Pressable, StyleSheet } from "react-native";
+import Animated, {
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
 
-import { Icon, Text, View, createThemedStyles } from "@shared/design-system";
-
-interface MenuItemProps {
-    href: string;
-    icon: string;
-    title: string;
-    subtitle: string;
-}
-
-function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
-    const styles = useStyles();
-
-    return (
-        <Link href={href as any} asChild>
-            <Pressable>
-                {({ pressed }) => (
-                    <RNView
-                        style={[
-                            styles.menuItem,
-                            pressed && styles.menuItemPressed,
-                        ]}
-                    >
-                        <RNView style={styles.menuItemLeft}>
-                            <Icon name={icon as any} size={24} color="brand" />
-                            <RNView style={styles.menuItemText}>
-                                <Text variant="bodySemibold">{title}</Text>
-                                <Text variant="bodySmall" color="muted">
-                                    {subtitle}
-                                </Text>
-                            </RNView>
-                        </RNView>
-                        <Icon name="chevron.right" size={20} color="default" />
-                    </RNView>
-                )}
-            </Pressable>
-        </Link>
-    );
-}
+import {
+    Icon,
+    Text,
+    View,
+    createThemedStyles,
+    type IconProps,
+} from "@shared/design-system";
 
 export default function SettingsScreen() {
     const styles = useStyles();
@@ -47,11 +22,11 @@ export default function SettingsScreen() {
     return (
         <View surface="primary" style={styles.root}>
             <SafeAreaView style={styles.safeArea} edges={["top"]}>
-                <RNView style={styles.header}>
+                <View style={styles.header}>
                     <Text variant="heading1">Settings</Text>
-                </RNView>
+                </View>
 
-                <RNView style={styles.menuContainer}>
+                <View style={styles.menuContainer}>
                     <MenuItem
                         href="/(tabs)/settings/accounts"
                         icon="creditcard.fill"
@@ -64,9 +39,63 @@ export default function SettingsScreen() {
                         title="Categories"
                         subtitle="Manage your categories"
                     />
-                </RNView>
+                </View>
             </SafeAreaView>
         </View>
+    );
+}
+
+interface MenuItemProps {
+    href: Href;
+    icon: IconProps["name"];
+    title: string;
+    subtitle: string;
+}
+
+const SPRING = { damping: 15, stiffness: 400, mass: 0.6 } as const;
+const SCALE_PRESSED = 0.97;
+const OPACITY_PRESSED = 0.75;
+
+function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
+    const styles = useStyles();
+    const scale = useSharedValue(1);
+    const opacity = useSharedValue(1);
+
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [{ scale: scale.value }],
+        opacity: opacity.value,
+    }));
+
+    const handlePressIn = () => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+        scale.value = withSpring(SCALE_PRESSED, SPRING);
+        opacity.value = withSpring(OPACITY_PRESSED, SPRING);
+    };
+
+    const handlePressOut = () => {
+        scale.value = withSpring(1, SPRING);
+        opacity.value = withSpring(1, SPRING);
+    };
+
+    return (
+        <Link href={href} asChild>
+            <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut}>
+                <Animated.View style={[styles.menuItem, animatedStyle]}>
+                    <View style={styles.menuItemLeft}>
+                        <Icon name={icon} size={24} color="brand" />
+                        <View style={styles.menuItemText}>
+                            <Text variant="bodySemibold">{title}</Text>
+                            <Text variant="bodySmall" color="muted">
+                                {subtitle}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <Icon name="chevron.right" size={20} color="default" />
+                </Animated.View>
+            </Pressable>
+        </Link>
     );
 }
 
@@ -79,11 +108,13 @@ const useStyles = createThemedStyles((theme) =>
             flex: 1,
         },
         header: {
-            padding: theme.spacing[5],
-            paddingBottom: theme.spacing[4],
+            paddingTop: theme.spacing[4],
+            paddingHorizontal: theme.spacing[5],
+            paddingBottom: theme.spacing[6],
         },
         menuContainer: {
             paddingHorizontal: theme.spacing[5],
+            rowGap: theme.spacing[3],
         },
         menuItem: {
             flexDirection: "row",
@@ -91,14 +122,10 @@ const useStyles = createThemedStyles((theme) =>
             justifyContent: "space-between",
             paddingVertical: theme.spacing[4],
             paddingHorizontal: theme.spacing[4],
-            backgroundColor: theme.colors.surface.subtle,
             borderRadius: theme.radii.md,
             borderWidth: 1,
             borderColor: theme.colors.border.default,
-            marginBottom: theme.spacing[3],
-        },
-        menuItemPressed: {
-            opacity: 0.7,
+            backgroundColor: theme.colors.surface.primary,
         },
         menuItemLeft: {
             flexDirection: "row",

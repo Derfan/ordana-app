@@ -30,6 +30,8 @@ export {
     Badge,
     FormField,
     useModalFormStyles,
+    AppBottomSheet,
+    useBottomSheetControls,
 } from "./components";
 export type {
     DSTextProps,
@@ -45,6 +47,8 @@ export type {
     BadgeVariant,
     BadgeSize,
     FormFieldProps,
+    AppBottomSheetProps,
+    AppBottomSheetHandle,
 } from "./components";
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────

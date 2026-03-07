@@ -19,5 +19,8 @@ export type { IconProps } from "./Icon";
 export { Modal, useModalFormStyles } from "./Modal";
 export type { ModalProps } from "./Modal";
 
+export { AppBottomSheet, useBottomSheetControls } from "./BottomSheet";
+export type { AppBottomSheetProps, AppBottomSheetHandle } from "./BottomSheet";
+
 export { Badge } from "./Badge";
 export type { BadgeProps, BadgeVariant, BadgeSize } from "./Badge";

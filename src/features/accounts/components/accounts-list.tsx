@@ -7,7 +7,13 @@ import {
     StyleSheet,
 } from "react-native";
 
-import { Button, Text, View, createThemedStyles } from "@shared/design-system";
+import {
+    Button,
+    Text,
+    View,
+    createThemedStyles,
+    useBottomSheetControls,
+} from "@shared/design-system";
 import { useAccounts } from "@hooks/use-accounts";
 import { formatCurrency } from "@shared/utils/currency";
 
@@ -15,18 +21,11 @@ import { AccountCard } from "./account-card";
 import { AddAccountModal } from "./add-account-modal";
 
 export function AccountsList() {
-    const {
-        accounts,
-        isLoading,
-        error,
-        refresh,
-        addAccount,
-        deleteAccount,
-        totalBalance,
-    } = useAccounts();
+    const { accounts, isLoading, error, refresh, deleteAccount, totalBalance } =
+        useAccounts();
 
-    const [isModalVisible, setIsModalVisible] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const addSheet = useBottomSheetControls();
 
     const styles = useStyles();
 
@@ -34,10 +33,6 @@ export function AccountsList() {
         setIsRefreshing(true);
         await refresh();
         setIsRefreshing(false);
-    };
-
-    const handleAddAccount = async (data: any) => {
-        await addAccount(data);
     };
 
     const handleDeleteAccount = (id: number, name: string) => {
@@ -99,7 +94,7 @@ export function AccountsList() {
                     variant="primary"
                     size="sm"
                     label="+ Add"
-                    onPress={() => setIsModalVisible(true)}
+                    onPress={addSheet.open}
                 />
             </View>
 
@@ -137,7 +132,7 @@ export function AccountsList() {
                                 variant="primary"
                                 size="lg"
                                 label="Create Account"
-                                onPress={() => setIsModalVisible(true)}
+                                onPress={addSheet.open}
                             />
                         </View>
                     }
@@ -150,11 +145,7 @@ export function AccountsList() {
                 />
             )}
 
-            <AddAccountModal
-                visible={isModalVisible}
-                onClose={() => setIsModalVisible(false)}
-                onSubmit={handleAddAccount}
-            />
+            <AddAccountModal ref={addSheet.ref} />
         </View>
     );
 }

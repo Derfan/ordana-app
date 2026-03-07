@@ -8,7 +8,13 @@ import {
     StyleSheet,
 } from "react-native";
 
-import { Button, Text, View, createThemedStyles } from "@shared/design-system";
+import {
+    Button,
+    Text,
+    View,
+    createThemedStyles,
+    useBottomSheetControls,
+} from "@shared/design-system";
 import type { CategoryType } from "@db/repositories";
 import { useCategories } from "@hooks/use-categories";
 
@@ -22,13 +28,12 @@ export function CategoriesList() {
         isLoading,
         error,
         refresh,
-        addCategory,
         deleteCategory,
     } = useCategories();
 
     const [activeTab, setActiveTab] = useState<CategoryType>("expense");
-    const [isModalVisible, setIsModalVisible] = useState(false);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const addSheet = useBottomSheetControls();
 
     const styles = useStyles();
 
@@ -39,10 +44,6 @@ export function CategoriesList() {
         setIsRefreshing(true);
         await refresh();
         setIsRefreshing(false);
-    };
-
-    const handleAddCategory = async (data: any) => {
-        await addCategory(data);
     };
 
     const handleDeleteCategory = (
@@ -102,7 +103,7 @@ export function CategoriesList() {
                     variant="primary"
                     size="sm"
                     label="+ Add"
-                    onPress={() => setIsModalVisible(true)}
+                    onPress={addSheet.open}
                 />
             </View>
 
@@ -190,12 +191,7 @@ export function CategoriesList() {
                 />
             )}
 
-            <AddCategoryModal
-                visible={isModalVisible}
-                onClose={() => setIsModalVisible(false)}
-                onSubmit={handleAddCategory}
-                defaultType={activeTab}
-            />
+            <AddCategoryModal ref={addSheet.ref} defaultType={activeTab} />
         </View>
     );
 }

@@ -1,5 +1,4 @@
 import { View } from "@shared/design-system";
-
 import { AccountsList } from "@features/accounts";
 
 export default function AccountsScreen() {

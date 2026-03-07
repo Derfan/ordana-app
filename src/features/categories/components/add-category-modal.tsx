@@ -1,16 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
+import { forwardRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-    Alert,
-    Pressable,
-    StyleSheet,
-    TextInput,
-    View as RNView,
-} from "react-native";
+import { Alert, Pressable, StyleSheet, View as RNView } from "react-native";
 import { z } from "zod";
 
-import { BaseModal } from "@components/ui/base-modal";
 import {
+    AppBottomSheet,
+    type AppBottomSheetHandle,
     Button,
     FormField,
     Text,
@@ -19,7 +16,8 @@ import {
     useModalFormStyles,
     useTheme,
 } from "@shared/design-system";
-import type { CategoryType, NewCategory } from "@db/repositories";
+import type { CategoryType } from "@db/repositories";
+import { useCategories } from "@hooks/use-categories";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
@@ -89,23 +87,20 @@ const CATEGORY_COLORS = [
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface AddCategoryModalProps {
-    visible: boolean;
-    onClose: () => void;
-    onSubmit: (data: NewCategory) => Promise<void>;
     defaultType?: CategoryType;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function AddCategoryModal({
-    visible,
-    onClose,
-    onSubmit,
-    defaultType = "expense",
-}: AddCategoryModalProps) {
+export const AddCategoryModal = forwardRef<
+    AppBottomSheetHandle,
+    AddCategoryModalProps
+>(function AddCategoryModal({ defaultType = "expense" }, ref) {
     const styles = useStyles();
     const formStyles = useModalFormStyles();
     const theme = useTheme();
+
+    const { addCategory } = useCategories();
 
     const {
         control,
@@ -125,16 +120,15 @@ export function AddCategoryModal({
 
     const watchedNameLength = watch("name").length;
 
-    const handleClose = () => {
-        if (!isSubmitting) {
-            reset();
-            onClose();
-        }
+    // Reset form each time the sheet is fully dismissed so stale data
+    // never shows when it is opened again.
+    const handleDismiss = () => {
+        reset();
     };
 
     const onValid = async (values: FormValues) => {
         try {
-            await onSubmit({
+            await addCategory({
                 name: values.name.trim(),
                 type: values.type,
                 icon: CATEGORY_ICONS[values.iconIndex],
@@ -142,7 +136,6 @@ export function AddCategoryModal({
                 isSystem: false,
             });
             reset();
-            onClose();
         } catch (err) {
             Alert.alert(
                 "Error",
@@ -154,11 +147,11 @@ export function AddCategoryModal({
     };
 
     return (
-        <BaseModal
-            visible={visible}
+        <AppBottomSheet
+            ref={ref}
             title="New Category"
-            onClose={handleClose}
             isSubmitting={isSubmitting}
+            onDismiss={handleDismiss}
         >
             {/* Type */}
             <Controller
@@ -228,7 +221,11 @@ export function AddCategoryModal({
                         error={errors.name?.message}
                         hint={`${watchedNameLength}/50 characters`}
                     >
-                        <TextInput
+                        {/*
+                         * BottomSheetTextInput registers this input with the sheet's
+                         * focus tracker so keyboardBehavior="extend" fires correctly.
+                         */}
+                        <BottomSheetTextInput
                             style={[
                                 formStyles.input,
                                 !!errors.name && styles.inputError,
@@ -320,9 +317,9 @@ export function AddCategoryModal({
                     onPress={handleSubmit(onValid)}
                 />
             </View>
-        </BaseModal>
+        </AppBottomSheet>
     );
-}
+});
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
