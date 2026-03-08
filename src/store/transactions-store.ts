@@ -10,6 +10,7 @@ interface TransactionsState {
     transactions: TransactionWithDetails[];
     isLoading: boolean;
     error: string | null;
+    lastUpdatedAt: number;
 
     // Actions
     loadTransactions: () => Promise<void>;
@@ -42,6 +43,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
     transactions: [],
     isLoading: false,
     error: null,
+    lastUpdatedAt: 0,
 
     loadTransactions: async () => {
         set({ isLoading: true, error: null });
@@ -66,7 +68,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             // Reload ALL transactions (not just recent)
             const transactions = await transactionService.getAllTransactions();
 
-            set({ transactions, isLoading: false });
+            set({ transactions, isLoading: false, lastUpdatedAt: Date.now() });
 
             // Reload accounts to update balance
             await useAccountsStore.getState().loadAccounts();
@@ -87,7 +89,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             // Reload ALL transactions
             const transactions = await transactionService.getAllTransactions();
 
-            set({ transactions, isLoading: false });
+            set({ transactions, isLoading: false, lastUpdatedAt: Date.now() });
 
             // Reload accounts to update balance
             await useAccountsStore.getState().loadAccounts();
@@ -109,6 +111,7 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
             set((state) => ({
                 transactions: state.transactions.filter((txn) => txn.id !== id),
                 isLoading: false,
+                lastUpdatedAt: Date.now(),
             }));
 
             // Reload accounts to update balance

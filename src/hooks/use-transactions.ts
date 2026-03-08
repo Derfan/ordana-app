@@ -5,28 +5,35 @@ import type { TransactionWithDetails } from "@db/repositories";
 import { useAppStateActive } from "@hooks/use-app-state";
 import { useTransactionsStore } from "@store/transactions-store";
 
+export const useTransactionMethods = () => {
+    const { addTransaction, deleteTransaction } = useTransactionsStore(
+        useShallow((state) => ({
+            addTransaction: state.addTransaction,
+            deleteTransaction: state.deleteTransaction,
+        })),
+    );
+
+    return {
+        addTransaction,
+        deleteTransaction,
+    };
+};
+
 /**
  * Hook for working with transactions
  * Automatically loads data when component mounts and app returns to foreground
  */
 export function useTransactions(limit?: number) {
-    const {
-        transactions,
-        isLoading,
-        error,
-        loadTransactions,
-        addTransaction,
-        deleteTransaction,
-    } = useTransactionsStore(
-        useShallow((state) => ({
-            transactions: state.transactions,
-            isLoading: state.isLoading,
-            error: state.error,
-            loadTransactions: state.loadTransactions,
-            addTransaction: state.addTransaction,
-            deleteTransaction: state.deleteTransaction,
-        })),
-    );
+    const { addTransaction, deleteTransaction } = useTransactionMethods();
+    const { transactions, isLoading, error, loadTransactions } =
+        useTransactionsStore(
+            useShallow((state) => ({
+                transactions: state.transactions,
+                isLoading: state.isLoading,
+                error: state.error,
+                loadTransactions: state.loadTransactions,
+            })),
+        );
 
     useAppStateActive(() => {
         loadTransactions();

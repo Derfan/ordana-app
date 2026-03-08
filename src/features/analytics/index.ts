@@ -1,5 +1,12 @@
 export { analyticsService } from "./services/analytics.service";
-export type { AnalyticsData, MonthlyStats } from "./services/analytics.service";
+export type {
+    AnalyticsData,
+    MonthlyStats,
+    MonthAnalytics,
+} from "./services/analytics.service";
 
-export { CategoryPieChart } from "./components/category-pie-chart";
-export { MonthPicker } from "./components/month-picker";
+export {
+    CategoryPieChart,
+    MonthPicker,
+    BalanceSummaryCard,
+} from "./components";

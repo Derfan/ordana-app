@@ -3,7 +3,8 @@ import { View as RNView, type ViewProps, type ViewStyle } from "react-native";
 
 import { useTheme } from "../../hooks/use-theme";
 import type { ThemeBgColors } from "../../theme/theme.types";
-import { type SpacingProp, resolveSpacing } from "./spacing-alias";
+import { resolveSpacing } from "./spacing-alias";
+import type { SpacingProp } from "./spacing-alias";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
