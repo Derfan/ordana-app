@@ -2,17 +2,16 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { HapticTab } from "@components/haptic-tab";
-import { IconSymbol } from "@components/ui/icon-symbol";
-import { Colors } from "@constants/theme";
-import { useColorScheme } from "@hooks/use-color-scheme";
+import { useTheme, Icon } from "@/shared/design-system";
 
 export default function TabLayout() {
-    const colorScheme = useColorScheme();
+    const theme = useTheme();
 
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+                tabBarActiveTintColor:
+                    theme.colors.interactive.primary.background,
                 headerShown: false,
                 tabBarButton: HapticTab,
             }}
@@ -22,7 +21,7 @@ export default function TabLayout() {
                 options={{
                     title: "Home",
                     tabBarIcon: ({ color }) => (
-                        <IconSymbol size={28} name="house.fill" color={color} />
+                        <Icon size={28} name="house.fill" colorValue={color} />
                     ),
                 }}
             />
@@ -31,7 +30,7 @@ export default function TabLayout() {
                 options={{
                     title: "History",
                     tabBarIcon: ({ color }) => (
-                        <IconSymbol size={28} name="clock.fill" color={color} />
+                        <Icon size={28} name="clock.fill" colorValue={color} />
                     ),
                 }}
             />
@@ -40,10 +39,10 @@ export default function TabLayout() {
                 options={{
                     title: "Analytics",
                     tabBarIcon: ({ color }) => (
-                        <IconSymbol
+                        <Icon
                             size={28}
                             name="chart.bar.fill"
-                            color={color}
+                            colorValue={color}
                         />
                     ),
                 }}
@@ -53,10 +52,10 @@ export default function TabLayout() {
                 options={({ route }) => ({
                     title: "Settings",
                     tabBarIcon: ({ color }) => (
-                        <IconSymbol
+                        <Icon
                             size={28}
                             name="gearshape.fill"
-                            color={color}
+                            colorValue={color}
                         />
                     ),
                     tabBarStyle:
