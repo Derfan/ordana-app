@@ -1,30 +1,30 @@
 import { Link, type Href } from "expo-router";
-import { Pressable, StyleSheet } from "react-native";
-import Animated, {
+import { Pressable, StyleSheet, View } from "react-native";
+import {
     useAnimatedStyle,
     useSharedValue,
     withSpring,
+    createAnimatedComponent,
 } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 
 import {
+    createThemedStyles,
+    useTheme,
     Icon,
     Text,
-    View,
-    createThemedStyles,
-    type IconProps,
+    Box,
 } from "@shared/design-system";
+import type { IconProps } from "@shared/design-system";
 
 export default function SettingsScreen() {
     const styles = useStyles();
 
     return (
-        <View surface="page" style={styles.root}>
-            <SafeAreaView style={styles.safeArea} edges={["top"]}>
-                <View style={styles.header}>
-                    <Text variant="heading1">Settings</Text>
-                </View>
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.content}>
+                <Text variant="heading1">Settings</Text>
 
                 <View style={styles.menuContainer}>
                     <MenuItem
@@ -40,8 +40,8 @@ export default function SettingsScreen() {
                         subtitle="Manage your categories"
                     />
                 </View>
-            </SafeAreaView>
-        </View>
+            </View>
+        </SafeAreaView>
     );
 }
 
@@ -56,7 +56,10 @@ const SPRING = { damping: 15, stiffness: 400, mass: 0.6 } as const;
 const SCALE_PRESSED = 0.97;
 const OPACITY_PRESSED = 0.75;
 
+const AnimatedBox = createAnimatedComponent(Box);
+
 function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
+    const theme = useTheme();
     const styles = useStyles();
     const scale = useSharedValue(1);
     const opacity = useSharedValue(1);
@@ -81,7 +84,15 @@ function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
     return (
         <Link href={href} asChild>
             <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut}>
-                <Animated.View style={[styles.menuItem, animatedStyle]}>
+                <AnimatedBox
+                    style={animatedStyle}
+                    radius={theme.radii.md}
+                    surface="elevated"
+                    direction="row"
+                    align="center"
+                    justify="space-between"
+                    padding="sm"
+                >
                     <View style={styles.menuItemLeft}>
                         <Icon name={icon} size={24} color="icon" />
                         <View style={styles.menuItemText}>
@@ -93,7 +104,7 @@ function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
                     </View>
 
                     <Icon name="chevron.right" size={20} color="default" />
-                </Animated.View>
+                </AnimatedBox>
             </Pressable>
         </Link>
     );
@@ -101,31 +112,16 @@ function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
-        root: {
-            flex: 1,
-        },
         safeArea: {
             flex: 1,
         },
-        header: {
-            paddingTop: theme.spacing[4],
-            paddingHorizontal: theme.spacing[5],
-            paddingBottom: theme.spacing[6],
+        content: {
+            flex: 1,
+            rowGap: theme.spacing[5],
+            marginHorizontal: theme.spacing[3],
         },
         menuContainer: {
-            paddingHorizontal: theme.spacing[5],
             rowGap: theme.spacing[3],
-        },
-        menuItem: {
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            paddingVertical: theme.spacing[4],
-            paddingHorizontal: theme.spacing[4],
-            borderRadius: theme.radii.md,
-            borderWidth: 1,
-            borderColor: theme.colors.border.default,
-            backgroundColor: theme.colors.bg.page,
         },
         menuItemLeft: {
             flexDirection: "row",

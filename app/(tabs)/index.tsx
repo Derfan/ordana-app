@@ -59,7 +59,7 @@ const useStyles = createThemedStyles((theme) =>
         content: {
             flex: 1,
             rowGap: theme.spacing[5],
-            marginHorizontal: theme.spacing[4],
+            marginHorizontal: theme.spacing[3],
         },
     }),
 );

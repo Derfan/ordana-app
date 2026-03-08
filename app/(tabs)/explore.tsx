@@ -174,7 +174,7 @@ const useStyles = createThemedStyles((theme) =>
         content: {
             flex: 1,
             rowGap: theme.spacing[2],
-            marginHorizontal: theme.spacing[4],
+            marginHorizontal: theme.spacing[3],
         },
         centerContainer: {
             flex: 1,

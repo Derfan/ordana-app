@@ -25,7 +25,7 @@ const useStyles = createThemedStyles((theme) =>
         },
         content: {
             rowGap: theme.spacing[5],
-            marginHorizontal: theme.spacing[4],
+            marginHorizontal: theme.spacing[3],
         },
     }),
 );
