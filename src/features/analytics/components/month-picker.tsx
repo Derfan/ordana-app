@@ -24,7 +24,12 @@ function isAtMax(year: number, month: number, maxDate: Date): boolean {
     );
 }
 
-export function MonthPicker({ year, month, onChange, maxDate }: MonthPickerProps) {
+export function MonthPicker({
+    year,
+    month,
+    onChange,
+    maxDate,
+}: MonthPickerProps) {
     const now = maxDate ?? new Date();
     const canGoForward = !isAtMax(year, month, now);
 
@@ -49,7 +54,10 @@ export function MonthPicker({ year, month, onChange, maxDate }: MonthPickerProps
         <View style={styles.container}>
             <Pressable
                 onPress={handlePrev}
-                style={({ pressed }) => [styles.arrow, pressed && styles.arrowPressed]}
+                style={({ pressed }) => [
+                    styles.arrow,
+                    pressed && styles.arrowPressed,
+                ]}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
                 accessibilityRole="button"
                 accessibilityLabel="Previous month"
@@ -73,7 +81,12 @@ export function MonthPicker({ year, month, onChange, maxDate }: MonthPickerProps
                 accessibilityRole="button"
                 accessibilityLabel="Next month"
             >
-                <ThemedText style={[styles.arrowText, !canGoForward && styles.arrowTextDisabled]}>
+                <ThemedText
+                    style={[
+                        styles.arrowText,
+                        !canGoForward && styles.arrowTextDisabled,
+                    ]}
+                >
                     ›
                 </ThemedText>
             </Pressable>
@@ -86,8 +99,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingVertical: 8,
-        paddingHorizontal: 4,
     },
     label: {
         fontSize: 16,
