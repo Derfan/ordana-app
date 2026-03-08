@@ -8,8 +8,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScrollView } from "react-native-gesture-handler";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
 import { CategoryPieChart, MonthPicker } from "@features/analytics";
 import { useMonthAnalytics } from "@hooks/use-analytics";
 import { formatCurrency } from "@shared/utils/currency";
@@ -32,12 +30,12 @@ export default function AnalyticsScreen() {
 
     if (error) {
         return (
-            <ThemedView style={styles.centerContainer}>
-                <ThemedText style={styles.errorText}>❌ {error}</ThemedText>
-                <ThemedText onPress={refresh} style={styles.retryText}>
+            <View style={styles.centerContainer}>
+                <Text variant="bodySemibold">❌ {error}</Text>
+                <Text variant="link" color="link" onPress={refresh}>
                     Retry
-                </ThemedText>
-            </ThemedView>
+                </Text>
+            </View>
         );
     }
 
@@ -64,9 +62,7 @@ export default function AnalyticsScreen() {
                     {isLoading || !data ? (
                         <View style={styles.centerContainer}>
                             <ActivityIndicator size="large" color="#0a7ea4" />
-                            <ThemedText style={styles.loadingText}>
-                                Loading analytics...
-                            </ThemedText>
+                            <Text color="muted">Loading analytics...</Text>
                         </View>
                     ) : (
                         <>
@@ -130,34 +126,38 @@ export default function AnalyticsScreen() {
                             </Box>
 
                             {data.expensesByCategory.length > 0 ? (
-                                <Box radius={theme.radii.md} surface="elevated">
+                                <Box
+                                    radius={theme.radii.md}
+                                    surface="elevated"
+                                    paddingX="md"
+                                    paddingY="md"
+                                >
+                                    <Text variant="subtitle">
+                                        Expenses by Category
+                                    </Text>
+
                                     <CategoryPieChart
                                         data={data.expensesByCategory}
-                                        title="Expenses by Category"
                                     />
                                 </Box>
                             ) : null}
 
                             {data.incomeByCategory.length > 0 ? (
-                                <Box radius={theme.radii.md} surface="elevated">
+                                <Box
+                                    radius={theme.radii.md}
+                                    surface="elevated"
+                                    paddingX="md"
+                                    paddingY="md"
+                                >
+                                    <Text variant="subtitle">
+                                        Income by Category
+                                    </Text>
+
                                     <CategoryPieChart
                                         data={data.incomeByCategory}
-                                        title="Income by Category"
                                     />
                                 </Box>
                             ) : null}
-
-                            {data.expensesByCategory.length === 0 &&
-                                data.incomeByCategory.length === 0 && (
-                                    <View style={styles.emptyState}>
-                                        <ThemedText style={styles.emptyIcon}>
-                                            📊
-                                        </ThemedText>
-                                        <ThemedText style={styles.emptyText}>
-                                            No transactions for this month
-                                        </ThemedText>
-                                    </View>
-                                )}
                         </>
                     )}
                 </View>
@@ -182,36 +182,9 @@ const useStyles = createThemedStyles((theme) =>
             alignItems: "center",
             paddingVertical: 48,
         },
-        loadingText: {
-            marginTop: 12,
-            opacity: 0.6,
-        },
-        errorText: {
-            fontSize: 16,
-            marginBottom: 16,
-            textAlign: "center",
-        },
-        retryText: {
-            color: "#007AFF",
-            fontSize: 16,
-            fontWeight: "600",
-        },
         statsContainer: {
             flexDirection: "row",
             columnGap: theme.spacing[2],
-        },
-        emptyState: {
-            alignItems: "center",
-            paddingVertical: 48,
-        },
-        emptyIcon: {
-            fontSize: 60,
-            marginBottom: 12,
-            lineHeight: 72,
-        },
-        emptyText: {
-            fontSize: 14,
-            opacity: 0.6,
         },
     }),
 );

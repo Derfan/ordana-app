@@ -1,67 +1,47 @@
 import { StyleSheet, View } from "react-native";
 import { PieChart } from "react-native-gifted-charts";
 
-import { ThemedText } from "@components/themed-text";
-import { ThemedView } from "@components/themed-view";
 import type { CategorySpending } from "@db/repositories";
-import { useThemeColor } from "@hooks/use-theme-color";
 import { formatCurrency } from "@shared/utils/currency";
-
-const useChartData = (data: CategorySpending[]) => {
-    return data.map((item, idx) => ({
-        color: item.categoryColor,
-        value: item.totalAmount,
-        label: item.categoryName,
-        percentage: `${(item.percentage * 100).toFixed(1)}%`,
-        focused: idx === 0,
-    }));
-};
+import { useTheme, Box, Text } from "@shared/design-system";
 
 interface CategoryPieChartProps {
     data: CategorySpending[];
-    title: string;
 }
 
-export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
+export function CategoryPieChart({ data }: CategoryPieChartProps) {
+    const theme = useTheme();
+
     const chartData = useChartData(data);
-    const surfaceColor = useThemeColor({}, "background");
 
     if (data.length === 0) {
         return (
-            <ThemedView style={styles.emptyContainer}>
-                <ThemedText style={styles.emptyIcon}>📊</ThemedText>
-                <ThemedText style={styles.emptyText}>
-                    No data for this period
-                </ThemedText>
-            </ThemedView>
+            <View style={styles.emptyContainer}>
+                <Text style={styles.emptyIcon}>📊</Text>
+                <Text color="muted">No data for this period</Text>
+            </View>
         );
     }
 
     return (
-        <ThemedView style={styles.container}>
-            <ThemedText type="subtitle" style={styles.title}>
-                {title}
-            </ThemedText>
-
+        <>
             <View style={styles.chartContainer}>
                 <PieChart
                     data={chartData}
                     radius={90}
                     innerRadius={60}
-                    innerCircleColor={surfaceColor}
+                    innerCircleColor={theme.colors.bg.elevated}
                     centerLabelComponent={(activeIdx: number) => {
                         const { label, percentage } =
                             chartData[activeIdx] ?? {};
 
                         return (
-                            <ThemedView style={styles.centerLabel}>
-                                <ThemedText
-                                    style={styles.centerLabelPercentage}
-                                >
-                                    {percentage}
-                                </ThemedText>
-                                <ThemedText>{label}</ThemedText>
-                            </ThemedView>
+                            <Box align="center" gapY="sm">
+                                <Text variant="amount">{percentage}</Text>
+                                <Text variant="hint" color="muted">
+                                    {label}
+                                </Text>
+                            </Box>
                         );
                     }}
                     focusOnPress
@@ -78,51 +58,41 @@ export function CategoryPieChart({ data, title }: CategoryPieChartProps) {
                                     { backgroundColor: item.categoryColor },
                                 ]}
                             />
-                            <ThemedText style={styles.categoryIcon}>
-                                {item.categoryIcon}
-                            </ThemedText>
-                            <ThemedText style={styles.categoryName}>
+                            <Text>{item.categoryIcon}</Text>
+                            <Text variant="bodySemibold">
                                 {item.categoryName}
-                            </ThemedText>
+                            </Text>
                         </View>
                         <View style={styles.legendRight}>
-                            <ThemedText style={styles.amount}>
+                            <Text variant="amount">
                                 {formatCurrency(item.totalAmount)}
-                            </ThemedText>
-                            <ThemedText style={styles.percentage}>
+                            </Text>
+                            <Text variant="hint" color="muted">
                                 {(item.percentage * 100).toFixed(1)}%
-                            </ThemedText>
+                            </Text>
                         </View>
                     </View>
                 ))}
             </View>
-        </ThemedView>
+        </>
     );
 }
 
+const useChartData = (data: CategorySpending[]) => {
+    return data.map((item, idx) => ({
+        color: item.categoryColor,
+        value: item.totalAmount,
+        label: item.categoryName,
+        percentage: `${(item.percentage * 100).toFixed(1)}%`,
+        focused: idx === 0,
+    }));
+};
+
 const styles = StyleSheet.create({
-    container: {
-        padding: 16,
-        borderRadius: 12,
-        backgroundColor: "rgba(0, 0, 0, 0.02)",
-    },
-    title: {
-        fontSize: 18,
-        marginBottom: 16,
-        textAlign: "center",
-    },
     chartContainer: {
         alignItems: "center",
         justifyContent: "center",
         marginVertical: 16,
-    },
-    centerLabel: {
-        alignItems: "center",
-        gap: 8,
-    },
-    centerLabelPercentage: {
-        fontSize: 20,
-        fontWeight: "600",
     },
     legend: {
         marginTop: 16,
@@ -145,35 +115,17 @@ const styles = StyleSheet.create({
         height: 12,
         borderRadius: 6,
     },
-    categoryIcon: {
-        fontSize: 18,
-    },
-    categoryName: {
-        fontSize: 14,
-        flex: 1,
-    },
     legendRight: {
         alignItems: "flex-end",
         gap: 2,
     },
-    amount: {
-        fontSize: 14,
-        fontWeight: "600",
-    },
-    percentage: {
-        fontSize: 12,
-        opacity: 0.6,
-    },
     emptyContainer: {
         padding: 40,
         alignItems: "center",
+        rowGap: 12,
     },
     emptyIcon: {
-        fontSize: 60,
-        marginBottom: 12,
-    },
-    emptyText: {
-        fontSize: 14,
-        opacity: 0.6,
+        fontSize: 40,
+        lineHeight: 40,
     },
 });

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from "react-native";
 
-import { ThemedText } from "@components/themed-text";
+import { Text, Icon } from "@shared/design-system";
 
 interface MonthPickerProps {
     year: number;
@@ -62,12 +62,10 @@ export function MonthPicker({
                 accessibilityRole="button"
                 accessibilityLabel="Previous month"
             >
-                <ThemedText style={styles.arrowText}>‹</ThemedText>
+                <Icon name="arrow.left" size={20} />
             </Pressable>
 
-            <ThemedText style={styles.label}>
-                {formatMonthLabel(year, month)}
-            </ThemedText>
+            <Text variant="bodySemibold">{formatMonthLabel(year, month)}</Text>
 
             <Pressable
                 onPress={handleNext}
@@ -81,14 +79,7 @@ export function MonthPicker({
                 accessibilityRole="button"
                 accessibilityLabel="Next month"
             >
-                <ThemedText
-                    style={[
-                        styles.arrowText,
-                        !canGoForward && styles.arrowTextDisabled,
-                    ]}
-                >
-                    ›
-                </ThemedText>
+                <Icon name="arrow.right" size={20} />
             </Pressable>
         </View>
     );
@@ -118,13 +109,5 @@ const styles = StyleSheet.create({
     },
     arrowDisabled: {
         opacity: 0.25,
-    },
-    arrowText: {
-        fontSize: 28,
-        lineHeight: 32,
-        fontWeight: "300",
-    },
-    arrowTextDisabled: {
-        opacity: 0.4,
     },
 });
