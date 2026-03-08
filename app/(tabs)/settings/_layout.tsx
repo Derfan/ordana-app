@@ -9,9 +9,9 @@ export default function SettingsLayout() {
         <Stack
             screenOptions={{
                 headerStyle: {
-                    backgroundColor: theme.colors.surface.primary,
+                    backgroundColor: theme.colors.bg.page,
                 },
-                headerTintColor: theme.colors.text.primary,
+                headerTintColor: theme.colors.fg.default,
             }}
         >
             <Stack.Screen

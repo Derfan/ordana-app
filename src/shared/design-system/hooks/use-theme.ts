@@ -7,8 +7,8 @@ import type { Theme } from "../theme/theme.types";
  *
  * Usage:
  *   const theme = useTheme();
- *   <View style={{ backgroundColor: theme.colors.surface.primary }} />
- *   <Text style={{ ...theme.typography.body, color: theme.colors.text.primary }} />
+ *   <View style={{ backgroundColor: theme.colors.bg.page }} />
+ *   <Text style={{ ...theme.typography.body, color: theme.colors.fg.default }} />
  *
  * This is the ONLY hook components should use to access design tokens.
  * Direct imports of lightTheme / darkTheme in components are an anti-pattern —

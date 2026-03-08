@@ -63,7 +63,7 @@ export function AccountsList() {
 
     if (error && accounts.length === 0) {
         return (
-            <View surface="primary" style={styles.centerContainer}>
+            <View surface="page" style={styles.centerContainer}>
                 <Text style={styles.errorText}>❌ {error}</Text>
                 <Button
                     variant="primary"
@@ -76,8 +76,8 @@ export function AccountsList() {
     }
 
     return (
-        <View surface="primary" style={styles.container}>
-            <View surface="primary" style={styles.header}>
+        <View surface="page" style={styles.container}>
+            <View surface="page" style={styles.header}>
                 <View
                     colorValue="transparent"
                     style={styles.headerBalanceBlock}
@@ -99,7 +99,7 @@ export function AccountsList() {
             </View>
 
             {isLoading && accounts.length === 0 ? (
-                <View surface="primary" style={styles.centerContainer}>
+                <View surface="page" style={styles.centerContainer}>
                     <ActivityIndicator size="large" />
                     <Text style={styles.loadingText}>Loading accounts...</Text>
                 </View>
@@ -179,12 +179,12 @@ const useStyles = createThemedStyles((theme) =>
         },
         errorText: {
             ...theme.typography.body,
-            color: theme.colors.status.error,
+            color: theme.colors.fg.danger,
             textAlign: "center",
         },
         loadingText: {
             ...theme.typography.bodySmall,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
             marginTop: theme.spacing[3],
         },
         emptyContainer: {
@@ -198,7 +198,7 @@ const useStyles = createThemedStyles((theme) =>
         },
         emptyText: {
             ...theme.typography.bodySmall,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
             textAlign: "center",
             lineHeight: 20,
             marginBottom: theme.spacing[4],

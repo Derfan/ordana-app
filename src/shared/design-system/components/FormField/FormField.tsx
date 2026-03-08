@@ -23,17 +23,17 @@ const useStyles = createThemedStyles((theme) =>
         },
         label: {
             ...theme.typography.label,
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
             marginBottom: theme.spacing[2],
         },
         error: {
             ...theme.typography.hint,
-            color: theme.colors.status.error,
+            color: theme.colors.fg.danger,
             marginTop: theme.spacing[1],
         },
         hint: {
             ...theme.typography.hint,
-            color: theme.colors.text.subtle,
+            color: theme.colors.fg.subtle,
             marginTop: theme.spacing[1],
         },
     }),

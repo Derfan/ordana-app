@@ -171,7 +171,7 @@ export const AddAccountModal = forwardRef<AppBottomSheetHandle>(
                                 onBlur={onBlur}
                                 placeholder="e.g., Main Card"
                                 placeholderTextColor={
-                                    theme.colors.text.placeholder
+                                    theme.colors.fg.placeholder
                                 }
                                 maxLength={100}
                                 autoFocus
@@ -208,7 +208,7 @@ export const AddAccountModal = forwardRef<AppBottomSheetHandle>(
                                     onBlur={onBlur}
                                     placeholder="0"
                                     placeholderTextColor={
-                                        theme.colors.text.placeholder
+                                        theme.colors.fg.placeholder
                                     }
                                     keyboardType="numeric"
                                     editable={!isSubmitting}
@@ -252,11 +252,11 @@ const useStyles = createThemedStyles((theme) =>
             borderRadius: theme.radii.md,
             borderWidth: 2,
             borderColor: theme.colors.border.default,
-            backgroundColor: theme.colors.surface.subtle,
+            backgroundColor: theme.colors.bg.sunken,
         },
         typeButtonActive: {
-            borderColor: theme.colors.brand.default,
-            backgroundColor: theme.colors.surface.overlay,
+            borderColor: theme.colors.accent.brand,
+            backgroundColor: theme.colors.overlay.card,
         },
         typeIcon: {
             fontSize: 32,
@@ -265,10 +265,10 @@ const useStyles = createThemedStyles((theme) =>
         },
         typeLabel: {
             ...theme.typography.labelSmall,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
         },
         typeLabelActive: {
-            color: theme.colors.brand.default,
+            color: theme.colors.accent.brand,
         },
         balanceInputWrapper: {
             position: "relative",
@@ -278,10 +278,10 @@ const useStyles = createThemedStyles((theme) =>
             right: theme.spacing[4],
             top: theme.spacing[3],
             ...theme.typography.body,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
         },
         inputError: {
-            borderColor: theme.colors.status.error,
+            borderColor: theme.colors.fg.danger,
         },
         submitButton: {
             marginTop: theme.spacing[4],

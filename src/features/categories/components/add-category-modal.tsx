@@ -234,7 +234,7 @@ export const AddCategoryModal = forwardRef<
                             onChangeText={onChange}
                             onBlur={onBlur}
                             placeholder="e.g., Groceries"
-                            placeholderTextColor={theme.colors.text.placeholder}
+                            placeholderTextColor={theme.colors.fg.placeholder}
                             maxLength={50}
                             autoFocus
                             editable={!isSubmitting}
@@ -326,7 +326,7 @@ export const AddCategoryModal = forwardRef<
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
         inputError: {
-            borderColor: theme.colors.status.error,
+            borderColor: theme.colors.border.danger,
         },
         iconsGrid: {
             flexDirection: "row",
@@ -339,13 +339,13 @@ const useStyles = createThemedStyles((theme) =>
             alignItems: "center",
             justifyContent: "center",
             borderRadius: theme.radii.sm,
-            backgroundColor: theme.colors.surface.muted,
+            backgroundColor: theme.colors.bg.muted,
             borderWidth: 2,
             borderColor: "transparent",
         },
         iconButtonActive: {
-            backgroundColor: theme.colors.surface.overlay,
-            borderColor: theme.colors.border.brandSubtle,
+            backgroundColor: theme.colors.overlay.card,
+            borderColor: theme.colors.border.brand,
         },
         iconText: {
             fontSize: 24,

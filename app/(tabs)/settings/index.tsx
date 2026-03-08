@@ -20,7 +20,7 @@ export default function SettingsScreen() {
     const styles = useStyles();
 
     return (
-        <View surface="primary" style={styles.root}>
+        <View surface="page" style={styles.root}>
             <SafeAreaView style={styles.safeArea} edges={["top"]}>
                 <View style={styles.header}>
                     <Text variant="heading1">Settings</Text>
@@ -83,7 +83,7 @@ function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
             <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut}>
                 <Animated.View style={[styles.menuItem, animatedStyle]}>
                     <View style={styles.menuItemLeft}>
-                        <Icon name={icon} size={24} color="brand" />
+                        <Icon name={icon} size={24} color="icon" />
                         <View style={styles.menuItemText}>
                             <Text variant="bodySemibold">{title}</Text>
                             <Text variant="bodySmall" color="muted">
@@ -125,7 +125,7 @@ const useStyles = createThemedStyles((theme) =>
             borderRadius: theme.radii.md,
             borderWidth: 1,
             borderColor: theme.colors.border.default,
-            backgroundColor: theme.colors.surface.primary,
+            backgroundColor: theme.colors.bg.page,
         },
         menuItemLeft: {
             flexDirection: "row",

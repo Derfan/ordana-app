@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { View as RNView, type ViewProps, type ViewStyle } from "react-native";
 
 import { useTheme } from "../../hooks/use-theme";
-import type { Theme } from "../../theme/theme.types";
+import type { ThemeBgColors } from "../../theme/theme.types";
 import { type SpacingProp, resolveSpacing } from "./spacing-alias";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type SurfaceKey = keyof Theme["colors"]["surface"];
+type SurfaceKey = keyof ThemeBgColors;
 
 export interface BoxProps extends Omit<ViewProps, "style"> {
     // ─── Spacing ──────────────────────────────────────────────────────────────
@@ -64,9 +64,9 @@ export interface BoxProps extends Omit<ViewProps, "style"> {
     // ─── Surface ──────────────────────────────────────────────────────────────
 
     /**
-     * Semantic background color from `theme.colors.surface`.
+     * Semantic background color from `theme.colors.bg`.
      * When omitted the Box is transparent — unlike the `View` primitive which
-     * defaults to `surface="primary"`. Box is a layout primitive first;
+     * defaults to `surface="page"`. Box is a layout primitive first;
      * background is opt-in.
      */
     surface?: SurfaceKey;
@@ -211,7 +211,7 @@ export function Box({
         // `bg` takes precedence; `surface` resolves through the theme.
         if (bg !== undefined) s.backgroundColor = bg;
         else if (surface !== undefined)
-            s.backgroundColor = theme.colors.surface[surface];
+            s.backgroundColor = theme.colors.bg[surface];
 
         // ─── Layout ───────────────────────────────────────────────────────────
         if (width !== undefined) s.width = width;
@@ -248,7 +248,7 @@ export function Box({
         surface,
         bg,
         // theme — only changes on light ↔ dark switch, not on every render
-        theme.colors.surface,
+        theme.colors.bg,
         // layout
         width,
         height,

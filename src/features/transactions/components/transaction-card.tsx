@@ -27,8 +27,8 @@ export function TransactionCard({
     const isIncome = transaction.type === "income";
     const sign = isIncome ? "+" : "-";
     const amountColor = isIncome
-        ? theme.colors.status.income
-        : theme.colors.status.expense;
+        ? theme.colors.fg.positive
+        : theme.colors.fg.negative;
 
     return (
         <Pressable
@@ -108,7 +108,7 @@ const useStyles = createThemedStyles((theme) =>
             alignItems: "center",
             padding: theme.spacing[4],
             gap: theme.spacing[3],
-            backgroundColor: theme.colors.surface.subtle,
+            backgroundColor: theme.colors.bg.sunken,
             borderRadius: theme.radii.md,
         },
         iconContainer: {
@@ -131,7 +131,7 @@ const useStyles = createThemedStyles((theme) =>
             height: 12,
             borderRadius: theme.radii.dot,
             borderWidth: 2,
-            borderColor: theme.colors.surface.primary,
+            borderColor: theme.colors.bg.page,
         },
         info: {
             flex: 1,

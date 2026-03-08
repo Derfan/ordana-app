@@ -202,7 +202,7 @@ export function AddTransactionModal({
                                 onBlur={onBlur}
                                 placeholder="0.00"
                                 placeholderTextColor={
-                                    theme.colors.text.placeholder
+                                    theme.colors.fg.placeholder
                                 }
                                 keyboardType="decimal-pad"
                                 editable={!isSubmitting}
@@ -337,7 +337,7 @@ export function AddTransactionModal({
                             onChangeText={onChange}
                             onBlur={onBlur}
                             placeholder="Add a note..."
-                            placeholderTextColor={theme.colors.text.placeholder}
+                            placeholderTextColor={theme.colors.fg.placeholder}
                             maxLength={500}
                             multiline
                             numberOfLines={3}
@@ -385,21 +385,21 @@ const useStyles = createThemedStyles((theme) =>
             borderColor: theme.colors.border.default,
             borderRadius: theme.radii.sm,
             paddingHorizontal: theme.spacing[3],
-            backgroundColor: theme.colors.surface.primary,
+            backgroundColor: theme.colors.bg.page,
         },
         inputError: {
-            borderColor: theme.colors.status.error,
+            borderColor: theme.colors.fg.danger,
         },
         currencySymbol: {
             ...theme.typography.amountInput,
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
             marginRight: theme.spacing[1],
         },
         amountInput: {
             flex: 1,
             ...theme.typography.amountInput,
             paddingVertical: theme.spacing[3],
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
         },
         descriptionInput: {
             minHeight: 80,
@@ -414,17 +414,17 @@ const useStyles = createThemedStyles((theme) =>
             paddingVertical: theme.spacing[2],
             paddingHorizontal: theme.spacing[4],
             borderRadius: theme.radii.pill,
-            backgroundColor: theme.colors.surface.muted,
+            backgroundColor: theme.colors.bg.muted,
             borderWidth: 2,
             borderColor: "transparent",
         },
         optionButtonActive: {
             backgroundColor: theme.colors.interactive.primary.background,
-            borderColor: theme.colors.brand.strong,
+            borderColor: theme.colors.accent.brandStrong,
         },
         optionText: {
             ...theme.typography.labelSmall,
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
         },
         optionTextActive: {
             color: theme.colors.interactive.primary.text,
@@ -433,7 +433,7 @@ const useStyles = createThemedStyles((theme) =>
             paddingVertical: theme.spacing[2],
             paddingHorizontal: theme.spacing[3],
             borderRadius: theme.radii.pill,
-            backgroundColor: theme.colors.surface.muted,
+            backgroundColor: theme.colors.bg.muted,
             borderWidth: 2,
             borderColor: "transparent",
             flexDirection: "row",
@@ -446,7 +446,7 @@ const useStyles = createThemedStyles((theme) =>
         },
         categoryText: {
             ...theme.typography.labelSmall,
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
         },
         categoryTextActive: {
             color: "#fff",
@@ -457,8 +457,8 @@ const useStyles = createThemedStyles((theme) =>
             borderWidth: 1,
             borderColor: theme.colors.border.default,
             borderRadius: theme.radii.sm,
-            backgroundColor: theme.colors.surface.subtle,
-            color: theme.colors.text.primary,
+            backgroundColor: theme.colors.bg.sunken,
+            color: theme.colors.fg.default,
         },
         submitButton: {
             marginTop: theme.spacing[4],

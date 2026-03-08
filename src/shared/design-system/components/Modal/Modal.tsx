@@ -46,7 +46,7 @@ export function Modal({
             presentationStyle="pageSheet"
             onRequestClose={handleClose}
         >
-            <View surface="primary" style={styles.container}>
+            <View surface="page" style={styles.container}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={styles.keyboardView}
@@ -62,7 +62,7 @@ export function Modal({
                         showsVerticalScrollIndicator={false}
                     >
                         <View
-                            surface="primary"
+                            surface="page"
                             style={[
                                 styles.header,
                                 { marginBottom: theme.spacing[8] },
@@ -87,7 +87,7 @@ export function Modal({
                             >
                                 <Text
                                     variant="body"
-                                    colorValue={theme.colors.icon.close}
+                                    colorValue={theme.colors.fg.icon}
                                     style={styles.closeButtonText}
                                 >
                                     ✕
@@ -123,7 +123,7 @@ export const useModalFormStyles = () => {
         },
         label: {
             ...theme.typography.label,
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
             marginBottom: theme.spacing[2],
         },
         input: {
@@ -132,12 +132,12 @@ export const useModalFormStyles = () => {
             borderRadius: theme.radii.sm,
             padding: theme.spacing[3],
             ...theme.typography.body,
-            backgroundColor: theme.colors.surface.primary,
-            color: theme.colors.text.primary,
+            backgroundColor: theme.colors.bg.page,
+            color: theme.colors.fg.default,
         },
         hint: {
             ...theme.typography.hint,
-            color: theme.colors.text.subtle,
+            color: theme.colors.fg.subtle,
             marginTop: theme.spacing[1],
         },
         typeButtons: {
@@ -149,28 +149,28 @@ export const useModalFormStyles = () => {
             padding: theme.spacing[3],
             borderRadius: theme.radii.sm,
             alignItems: "center" as const,
-            backgroundColor: theme.colors.surface.muted,
+            backgroundColor: theme.colors.bg.muted,
             borderWidth: 2,
             borderColor: "transparent",
         },
         typeButtonActiveExpense: {
-            backgroundColor: theme.colors.status.expenseSubtle,
-            borderColor: theme.colors.status.expenseBorder,
+            backgroundColor: theme.colors.bg.negativeSubtle,
+            borderColor: theme.colors.border.negative,
         },
         typeButtonActiveIncome: {
-            backgroundColor: theme.colors.status.incomeSubtle,
-            borderColor: theme.colors.status.incomeBorder,
+            backgroundColor: theme.colors.bg.positiveSubtle,
+            borderColor: theme.colors.border.positive,
         },
         typeButtonText: {
             ...theme.typography.labelSmall,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
         },
         typeButtonTextActive: {
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
         },
         emptyText: {
             ...theme.typography.bodySmall,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
             fontStyle: "italic" as const,
         },
     });

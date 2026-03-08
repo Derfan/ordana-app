@@ -28,12 +28,12 @@ type StylesFactory<T extends StyleSheet.NamedStyles<T>> = (theme: Theme) => T;
  *     StyleSheet.create({
  *       container: {
  *         flex: 1,
- *         backgroundColor: theme.colors.surface.primary,
+ *         backgroundColor: theme.colors.bg.page,
  *         padding: theme.spacing[5],
  *       },
  *       title: {
  *         ...theme.typography.heading1,
- *         color: theme.colors.text.primary,
+ *         color: theme.colors.fg.default,
  *       },
  *     })
  *   );

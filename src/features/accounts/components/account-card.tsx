@@ -44,8 +44,8 @@ export function AccountCard({
                         variant="amountLarge"
                         colorValue={
                             isNegative
-                                ? theme.colors.status.error
-                                : theme.colors.text.primary
+                                ? theme.colors.fg.danger
+                                : theme.colors.fg.default
                         }
                     >
                         {formatCurrency(balance)}
@@ -89,10 +89,10 @@ const useStyles = createThemedStyles((theme) =>
             alignItems: "center",
             justifyContent: "space-between",
             padding: theme.spacing[4],
-            backgroundColor: theme.colors.surface.overlay,
+            backgroundColor: theme.colors.overlay.card,
             borderRadius: theme.radii.md,
             borderWidth: 1,
-            borderColor: theme.colors.border.brandSubtle,
+            borderColor: theme.colors.border.brand,
         },
         info: {
             flex: 1,
@@ -102,7 +102,7 @@ const useStyles = createThemedStyles((theme) =>
             width: 32,
             height: 32,
             borderRadius: theme.radii.circle,
-            backgroundColor: theme.colors.status.danger,
+            backgroundColor: theme.colors.accent.danger,
             alignItems: "center",
             justifyContent: "center",
             marginLeft: theme.spacing[3],

@@ -104,7 +104,7 @@ function CloseButton({ disabled }: { disabled: boolean }) {
         >
             <Text
                 variant="body"
-                colorValue={theme.colors.icon.close}
+                colorValue={theme.colors.fg.icon}
                 style={styles.closeButtonText}
             >
                 ✕
@@ -183,13 +183,13 @@ export const AppBottomSheet = forwardRef<
     );
 
     const backgroundStyle = {
-        backgroundColor: theme.colors.surface.primary,
+        backgroundColor: theme.colors.bg.page,
         borderTopLeftRadius: theme.radii.iconCircle,
         borderTopRightRadius: theme.radii.iconCircle,
     };
 
     const handleIndicatorStyle = {
-        backgroundColor: theme.colors.border.muted,
+        backgroundColor: theme.colors.border.subtle,
         width: 40,
         height: 4,
     };

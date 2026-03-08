@@ -2,10 +2,10 @@ import type { SymbolViewProps, SymbolWeight } from "expo-symbols";
 import type { StyleProp, TextStyle } from "react-native";
 
 import { useTheme } from "../../hooks/use-theme";
-import type { Theme } from "../../theme/theme.types";
+import type { ThemeFgColors } from "../../theme/theme.types";
 import { IconSymbol } from "@components/ui/icon-symbol";
 
-type IconColorKey = keyof Theme["colors"]["icon"];
+type IconColorKey = keyof ThemeFgColors;
 
 export interface IconProps {
     /**
@@ -22,9 +22,9 @@ export interface IconProps {
     size?: number;
 
     /**
-     * Semantic icon color key from `theme.colors.icon`.
+     * Semantic icon color key from `theme.colors.fg`.
      * Resolves correctly for the active color scheme.
-     * @default 'default'
+     * @default 'icon'
      */
     color?: IconColorKey;
 
@@ -41,22 +41,24 @@ export interface IconProps {
      */
     weight?: SymbolWeight;
 
-    /** Layout style applied to the icon. TextStyle is the common denominator
-     *  between iOS (SymbolView/ViewStyle) and Android/web (MaterialIcons/TextStyle). */
+    /**
+     * Layout style applied to the icon. TextStyle is the common denominator
+     * between iOS (SymbolView/ViewStyle) and Android/web (MaterialIcons/TextStyle).
+     */
     style?: StyleProp<TextStyle>;
 }
 
 export function Icon({
     name,
     size = 24,
-    color = "default",
+    color = "icon",
     colorValue,
     weight = "regular",
     style,
 }: IconProps) {
     const theme = useTheme();
 
-    const resolvedColor = colorValue ?? theme.colors.icon[color];
+    const resolvedColor = colorValue ?? theme.colors.fg[color];
 
     return (
         <IconSymbol

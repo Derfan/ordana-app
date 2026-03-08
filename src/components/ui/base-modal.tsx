@@ -40,7 +40,7 @@ export function BaseModal({
             presentationStyle="pageSheet"
             onRequestClose={handleClose}
         >
-            <View surface="primary" style={styles.container}>
+            <View surface="page" style={styles.container}>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
                     style={styles.keyboardView}
@@ -49,7 +49,7 @@ export function BaseModal({
                         contentContainerStyle={styles.scrollContent}
                         showsVerticalScrollIndicator={false}
                     >
-                        <View surface="primary" style={styles.header}>
+                        <View surface="page" style={styles.header}>
                             <Text variant="heading1">{title}</Text>
                             <Pressable
                                 onPress={handleClose}
@@ -115,7 +115,7 @@ export const useModalFormStyles = createThemedStyles((theme) =>
         },
         label: {
             ...theme.typography.label,
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
             marginBottom: theme.spacing[2],
         },
         input: {
@@ -124,12 +124,12 @@ export const useModalFormStyles = createThemedStyles((theme) =>
             borderRadius: theme.radii.sm,
             padding: theme.spacing[3],
             ...theme.typography.body,
-            backgroundColor: theme.colors.surface.primary,
-            color: theme.colors.text.primary,
+            backgroundColor: theme.colors.bg.page,
+            color: theme.colors.fg.default,
         },
         hint: {
             ...theme.typography.hint,
-            color: theme.colors.text.subtle,
+            color: theme.colors.fg.subtle,
             marginTop: theme.spacing[1],
         },
         typeButtons: {
@@ -141,28 +141,28 @@ export const useModalFormStyles = createThemedStyles((theme) =>
             padding: theme.spacing[3],
             borderRadius: theme.radii.sm,
             alignItems: "center",
-            backgroundColor: theme.colors.surface.muted,
+            backgroundColor: theme.colors.bg.muted,
             borderWidth: 2,
             borderColor: "transparent",
         },
         typeButtonActiveExpense: {
-            backgroundColor: theme.colors.status.expenseSubtle,
-            borderColor: theme.colors.status.expenseBorder,
+            backgroundColor: theme.colors.bg.negativeSubtle,
+            borderColor: theme.colors.border.negative,
         },
         typeButtonActiveIncome: {
-            backgroundColor: theme.colors.status.incomeSubtle,
-            borderColor: theme.colors.status.incomeBorder,
+            backgroundColor: theme.colors.bg.positiveSubtle,
+            borderColor: theme.colors.border.positive,
         },
         typeButtonText: {
             ...theme.typography.labelSmall,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
         },
         typeButtonTextActive: {
-            color: theme.colors.text.primary,
+            color: theme.colors.fg.default,
         },
         emptyText: {
             ...theme.typography.bodySmall,
-            color: theme.colors.text.muted,
+            color: theme.colors.fg.muted,
             fontStyle: "italic",
         },
     }),
