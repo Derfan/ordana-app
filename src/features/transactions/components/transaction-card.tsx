@@ -3,6 +3,7 @@ import { Pressable, StyleSheet } from "react-native";
 import {
     Text,
     View,
+    Box,
     createThemedStyles,
     useTheme,
 } from "@shared/design-system";
@@ -26,22 +27,23 @@ export function TransactionCard({
 
     const isIncome = transaction.type === "income";
     const sign = isIncome ? "+" : "-";
-    const amountColor = isIncome
-        ? theme.colors.fg.positive
-        : theme.colors.fg.negative;
 
     return (
         <Pressable
             onPress={onPress}
             onLongPress={onLongPress}
-            style={({ pressed }) => [
-                styles.card,
-                pressed && styles.cardPressed,
-            ]}
+            style={({ pressed }) => pressed && styles.cardPressed}
             accessibilityRole="button"
             accessibilityLabel={`${transaction.category.name}, ${sign}${formatCurrency(transaction.amount)}`}
         >
-            <View style={styles.content}>
+            <Box
+                radius={theme.radii.md}
+                direction="row"
+                align="center"
+                surface="elevated"
+                padding="sm"
+                gapX="sm"
+            >
                 {/* Category icon with color badge */}
                 <View
                     colorValue={`${transaction.category.color}20`}
@@ -63,6 +65,7 @@ export function TransactionCard({
                         <Text variant="caption" color="muted">
                             {transaction.account.name}
                         </Text>
+
                         {transaction.description && (
                             <>
                                 <Text variant="caption" color="subtle">
@@ -78,36 +81,28 @@ export function TransactionCard({
                             </>
                         )}
                     </View>
+
                     <Text variant="hint" color="subtle">
                         {formatDate(transaction.date)}
                     </Text>
                 </View>
 
-                {/* Amount */}
-                <Text style={[styles.amount, { color: amountColor }]}>
+                <Text
+                    variant="amount"
+                    color={isIncome ? "success" : "negative"}
+                >
                     {sign}
                     {formatCurrency(transaction.amount)}
                 </Text>
-            </View>
+            </Box>
         </Pressable>
     );
 }
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
-        card: {
-            borderRadius: theme.radii.md,
-        },
         cardPressed: {
             opacity: 0.7,
-        },
-        content: {
-            flexDirection: "row",
-            alignItems: "center",
-            padding: theme.spacing[4],
-            gap: theme.spacing[3],
-            backgroundColor: theme.colors.bg.sunken,
-            borderRadius: theme.radii.md,
         },
         iconContainer: {
             width: 48,
@@ -140,11 +135,6 @@ const useStyles = createThemedStyles((theme) =>
             alignItems: "center",
             gap: theme.spacing[1],
             flexWrap: "wrap",
-        },
-        amount: {
-            ...theme.typography.amount,
-            minWidth: 80,
-            textAlign: "right",
         },
     }),
 );

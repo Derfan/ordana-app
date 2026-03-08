@@ -9,9 +9,11 @@ export default function HistoryScreen() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.content}>
+            <View style={styles.header}>
                 <Text variant="heading1">History</Text>
+            </View>
 
+            <View style={styles.content}>
                 <TransactionsList />
             </View>
         </SafeAreaView>
@@ -21,11 +23,16 @@ export default function HistoryScreen() {
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
         safeArea: {
-            flex: 1,
+            flexGrow: 1,
+        },
+        header: {
+            marginVertical: theme.spacing[1],
+            paddingHorizontal: theme.spacing[2],
         },
         content: {
-            rowGap: theme.spacing[5],
-            marginHorizontal: theme.spacing[3],
+            rowGap: theme.spacing[4],
+            paddingHorizontal: theme.spacing[2],
+            paddingVertical: theme.spacing[4],
         },
     }),
 );

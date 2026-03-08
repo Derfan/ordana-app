@@ -37,6 +37,7 @@ export {
     VStack,
     HStack,
     Spacer,
+    Divider,
     resolveSpacing,
     spacingAliasMap,
 } from "./components";
@@ -59,6 +60,7 @@ export type {
     BoxProps,
     StackProps,
     SpacerProps,
+    DividerProps,
     SpacingProp,
     SpacingAlias,
 } from "./components";

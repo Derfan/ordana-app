@@ -4,13 +4,10 @@
         "strict": true,
         "paths": {
             "@/*": ["./src/*"],
-            "@components/*": ["./src/components/*"],
             "@features/*": ["./src/features/*"],
             "@db/*": ["./src/db/*"],
             "@store/*": ["./src/store/*"],
             "@hooks/*": ["./src/hooks/*"],
-            "@utils/*": ["./src/utils/*"],
-            "@constants/*": ["./src/constants/*"],
             "@shared/*": ["./src/shared/*"]
         }
     },

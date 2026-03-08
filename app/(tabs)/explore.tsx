@@ -40,141 +40,147 @@ export default function AnalyticsScreen() {
     }
 
     return (
-        <ScrollView
-            showsVerticalScrollIndicator={false}
-            scrollEventThrottle={16}
-            refreshControl={
-                <RefreshControl refreshing={isLoading} onRefresh={refresh} />
-            }
-            removeClippedSubviews
-        >
-            <SafeAreaView style={styles.safeArea}>
-                <View style={styles.content}>
-                    <Text variant="heading1">Analytics</Text>
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.header}>
+                <Text variant="heading1">Analytics</Text>
+            </View>
 
-                    <MonthPicker
-                        year={year}
-                        month={month}
-                        onChange={handleMonthChange}
-                        maxDate={now}
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                scrollEventThrottle={16}
+                contentContainerStyle={styles.content}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isLoading}
+                        onRefresh={refresh}
                     />
+                }
+                removeClippedSubviews
+            >
+                <MonthPicker
+                    year={year}
+                    month={month}
+                    onChange={handleMonthChange}
+                    maxDate={now}
+                />
 
-                    {isLoading || !data ? (
-                        <View style={styles.centerContainer}>
-                            <ActivityIndicator size="large" color="#0a7ea4" />
-                            <Text color="muted">Loading analytics...</Text>
-                        </View>
-                    ) : (
-                        <>
-                            <View style={styles.statsContainer}>
-                                <Box
-                                    radius={theme.radii.md}
-                                    surface="elevated"
-                                    paddingX="md"
-                                    paddingY="sm"
-                                    flex={1}
-                                >
-                                    <Text variant="caption" color="muted">
-                                        Income
-                                    </Text>
-                                    <Text variant="amount" color="success">
-                                        {formatCurrency(data.stats.totalIncome)}
-                                    </Text>
-                                </Box>
-
-                                <Box
-                                    radius={theme.radii.md}
-                                    surface="elevated"
-                                    paddingX="md"
-                                    paddingY="sm"
-                                    flex={1}
-                                >
-                                    <Text variant="caption" color="muted">
-                                        Expenses
-                                    </Text>
-                                    <Text variant="amount" color="danger">
-                                        {formatCurrency(
-                                            data.stats.totalExpense,
-                                        )}
-                                    </Text>
-                                </Box>
-                            </View>
+                {isLoading || !data ? (
+                    <View style={styles.centerContainer}>
+                        <ActivityIndicator size="large" color="#0a7ea4" />
+                        <Text color="muted">Loading analytics...</Text>
+                    </View>
+                ) : (
+                    <>
+                        <View style={styles.statsContainer}>
+                            <Box
+                                radius={theme.radii.md}
+                                surface="elevated"
+                                paddingX="md"
+                                paddingY="sm"
+                                flex={1}
+                            >
+                                <Text variant="caption" color="muted">
+                                    Income
+                                </Text>
+                                <Text variant="amount" color="success">
+                                    {formatCurrency(data.stats.totalIncome)}
+                                </Text>
+                            </Box>
 
                             <Box
                                 radius={theme.radii.md}
                                 surface="elevated"
                                 paddingX="md"
                                 paddingY="sm"
-                                align="center"
+                                flex={1}
                             >
                                 <Text variant="caption" color="muted">
-                                    Net Balance
+                                    Expenses
                                 </Text>
-                                <Text
-                                    variant="amountLarge"
-                                    color={
-                                        data.stats.balance > 0
-                                            ? "success"
-                                            : "danger"
-                                    }
-                                >
-                                    {formatCurrency(data.stats.balance)}
-                                </Text>
-                                <Text variant="hint" color="muted">
-                                    {data.stats.transactionCount} transactions
+                                <Text variant="amount" color="danger">
+                                    {formatCurrency(data.stats.totalExpense)}
                                 </Text>
                             </Box>
+                        </View>
 
-                            {data.expensesByCategory.length > 0 ? (
-                                <Box
-                                    radius={theme.radii.md}
-                                    surface="elevated"
-                                    paddingX="md"
-                                    paddingY="md"
-                                >
-                                    <Text variant="subtitle">
-                                        Expenses by Category
-                                    </Text>
+                        <Box
+                            radius={theme.radii.md}
+                            surface="elevated"
+                            paddingX="md"
+                            paddingY="sm"
+                            align="center"
+                        >
+                            <Text variant="caption" color="muted">
+                                Net Balance
+                            </Text>
+                            <Text
+                                variant="amountLarge"
+                                color={
+                                    data.stats.balance > 0
+                                        ? "success"
+                                        : "danger"
+                                }
+                            >
+                                {formatCurrency(data.stats.balance)}
+                            </Text>
+                            <Text variant="hint" color="muted">
+                                {data.stats.transactionCount} transactions
+                            </Text>
+                        </Box>
 
-                                    <CategoryPieChart
-                                        data={data.expensesByCategory}
-                                    />
-                                </Box>
-                            ) : null}
+                        {data.expensesByCategory.length > 0 ? (
+                            <Box
+                                radius={theme.radii.md}
+                                surface="elevated"
+                                paddingX="md"
+                                paddingY="md"
+                            >
+                                <Text variant="subtitle">
+                                    Expenses by Category
+                                </Text>
 
-                            {data.incomeByCategory.length > 0 ? (
-                                <Box
-                                    radius={theme.radii.md}
-                                    surface="elevated"
-                                    paddingX="md"
-                                    paddingY="md"
-                                >
-                                    <Text variant="subtitle">
-                                        Income by Category
-                                    </Text>
+                                <CategoryPieChart
+                                    data={data.expensesByCategory}
+                                />
+                            </Box>
+                        ) : null}
 
-                                    <CategoryPieChart
-                                        data={data.incomeByCategory}
-                                    />
-                                </Box>
-                            ) : null}
-                        </>
-                    )}
-                </View>
-            </SafeAreaView>
-        </ScrollView>
+                        {data.incomeByCategory.length > 0 ? (
+                            <Box
+                                radius={theme.radii.md}
+                                surface="elevated"
+                                paddingX="md"
+                                paddingY="md"
+                            >
+                                <Text variant="subtitle">
+                                    Income by Category
+                                </Text>
+
+                                <CategoryPieChart
+                                    data={data.incomeByCategory}
+                                />
+                            </Box>
+                        ) : null}
+                    </>
+                )}
+            </ScrollView>
+        </SafeAreaView>
     );
 }
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
         safeArea: {
-            flex: 1,
+            flexGrow: 1,
+        },
+        header: {
+            marginVertical: theme.spacing[1],
+            paddingHorizontal: theme.spacing[2],
         },
         content: {
-            flex: 1,
-            rowGap: theme.spacing[2],
-            marginHorizontal: theme.spacing[3],
+            rowGap: theme.spacing[4],
+            paddingHorizontal: theme.spacing[2],
+            paddingVertical: theme.spacing[4],
         },
         centerContainer: {
             flex: 1,

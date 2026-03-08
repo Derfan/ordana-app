@@ -7,6 +7,9 @@ export type { StackProps } from "./Box";
 export { Spacer } from "./Box";
 export type { SpacerProps } from "./Box";
 
+export { Divider } from "./Box";
+export type { DividerProps } from "./Box";
+
 export { resolveSpacing, spacingAliasMap } from "./Box";
 export type { SpacingAlias, SpacingProp } from "./Box";
 

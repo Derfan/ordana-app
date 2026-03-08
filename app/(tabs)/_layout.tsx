@@ -1,8 +1,7 @@
 import { Tabs } from "expo-router";
-import React from "react";
 
-import { HapticTab } from "@components/haptic-tab";
 import { useTheme, Icon } from "@/shared/design-system";
+import { HapticTab } from "@shared/components";
 
 export default function TabLayout() {
     const theme = useTheme();
@@ -10,8 +9,12 @@ export default function TabLayout() {
     return (
         <Tabs
             screenOptions={{
-                tabBarActiveTintColor:
-                    theme.colors.interactive.primary.background,
+                tabBarActiveTintColor: theme.colors.accent.brand,
+                tabBarStyle: {
+                    backgroundColor: theme.colors.bg.elevated,
+                    borderTopLeftRadius: theme.radii.md,
+                    borderTopRightRadius: theme.radii.md,
+                },
                 headerShown: false,
                 tabBarButton: HapticTab,
             }}
@@ -20,8 +23,12 @@ export default function TabLayout() {
                 name="index"
                 options={{
                     title: "Home",
-                    tabBarIcon: ({ color }) => (
-                        <Icon size={28} name="house.fill" colorValue={color} />
+                    tabBarIcon: ({ color, focused }) => (
+                        <Icon
+                            size={28}
+                            name={focused ? "house.fill" : "house"}
+                            colorValue={color}
+                        />
                     ),
                 }}
             />
@@ -29,8 +36,12 @@ export default function TabLayout() {
                 name="history"
                 options={{
                     title: "History",
-                    tabBarIcon: ({ color }) => (
-                        <Icon size={28} name="clock.fill" colorValue={color} />
+                    tabBarIcon: ({ color, focused }) => (
+                        <Icon
+                            size={28}
+                            name={focused ? "clock.fill" : "clock"}
+                            colorValue={color}
+                        />
                     ),
                 }}
             />
@@ -38,10 +49,10 @@ export default function TabLayout() {
                 name="explore"
                 options={{
                     title: "Analytics",
-                    tabBarIcon: ({ color }) => (
+                    tabBarIcon: ({ color, focused }) => (
                         <Icon
                             size={28}
-                            name="chart.bar.fill"
+                            name={focused ? "chart.pie.fill" : "chart.pie"}
                             colorValue={color}
                         />
                     ),
@@ -49,20 +60,16 @@ export default function TabLayout() {
             />
             <Tabs.Screen
                 name="settings"
-                options={({ route }) => ({
+                options={{
                     title: "Settings",
-                    tabBarIcon: ({ color }) => (
+                    tabBarIcon: ({ color, focused }) => (
                         <Icon
                             size={28}
-                            name="gearshape.fill"
+                            name={focused ? "gearshape.fill" : "gearshape"}
                             colorValue={color}
                         />
                     ),
-                    tabBarStyle:
-                        ((route as any).state?.index ?? 0) > 0
-                            ? { display: "none" }
-                            : undefined,
-                })}
+                }}
             />
         </Tabs>
     );

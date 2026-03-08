@@ -23,9 +23,11 @@ export default function SettingsScreen() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.content}>
+            <View style={styles.header}>
                 <Text variant="heading1">Settings</Text>
+            </View>
 
+            <View style={styles.content}>
                 <View style={styles.menuContainer}>
                     <MenuItem
                         href="/(tabs)/settings/accounts"
@@ -113,12 +115,16 @@ function MenuItem({ href, icon, title, subtitle }: MenuItemProps) {
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
         safeArea: {
-            flex: 1,
+            flexGrow: 1,
+        },
+        header: {
+            marginVertical: theme.spacing[1],
+            paddingHorizontal: theme.spacing[2],
         },
         content: {
-            flex: 1,
-            rowGap: theme.spacing[5],
-            marginHorizontal: theme.spacing[3],
+            rowGap: theme.spacing[4],
+            paddingHorizontal: theme.spacing[2],
+            paddingVertical: theme.spacing[4],
         },
         menuContainer: {
             rowGap: theme.spacing[3],

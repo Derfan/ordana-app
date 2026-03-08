@@ -19,47 +19,56 @@ export default function HomeScreen() {
     const { addTransaction } = useTransactionMethods();
 
     return (
-        <ScrollView
-            showsVerticalScrollIndicator={false}
-            scrollEventThrottle={16}
-            removeClippedSubviews
-        >
-            <SafeAreaView style={styles.safeArea}>
-                <View style={styles.content}>
-                    <Text variant="heading1">Home</Text>
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.header}>
+                <Text variant="heading1">Home</Text>
+            </View>
 
-                    <BalanceSummaryCard />
+            <ScrollView
+                contentContainerStyle={styles.content}
+                showsVerticalScrollIndicator={false}
+                scrollEventThrottle={16}
+                removeClippedSubviews
+            >
+                <BalanceSummaryCard />
 
-                    <Button
-                        label="Add Transaction"
-                        leftIcon={
-                            <Icon name="plus" color="default" size={20} />
-                        }
-                        onPress={() => setIsModalVisible(true)}
-                    />
+                <Button
+                    label="Add Transaction"
+                    leftIcon={<Icon name="plus" color="default" size={20} />}
+                    onPress={() => setIsModalVisible(true)}
+                />
 
+                <View style={styles.section}>
+                    <Text variant="subtitle">Recent Transactions</Text>
                     <RecentTransactionsList />
-
-                    <AddTransactionModal
-                        visible={isModalVisible}
-                        onClose={() => setIsModalVisible(false)}
-                        onSubmit={addTransaction}
-                    />
                 </View>
-            </SafeAreaView>
-        </ScrollView>
+            </ScrollView>
+
+            <AddTransactionModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                onSubmit={addTransaction}
+            />
+        </SafeAreaView>
     );
 }
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
         safeArea: {
-            flex: 1,
+            flexGrow: 1,
+        },
+        header: {
+            marginVertical: theme.spacing[1],
+            paddingHorizontal: theme.spacing[2],
         },
         content: {
-            flex: 1,
-            rowGap: theme.spacing[5],
-            marginHorizontal: theme.spacing[3],
+            rowGap: theme.spacing[4],
+            paddingHorizontal: theme.spacing[2],
+            paddingVertical: theme.spacing[4],
+        },
+        section: {
+            rowGap: theme.spacing[3],
         },
     }),
 );

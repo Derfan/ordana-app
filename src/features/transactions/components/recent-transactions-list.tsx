@@ -9,73 +9,71 @@ export const RecentTransactionsList = () => {
     const theme = useTheme();
     const styles = useStyles();
 
-    const { transactions, isLoading: transactionsLoading } =
-        useRecentTransactions(5);
+    const { transactions, isLoading } = useRecentTransactions(5);
+
+    if (isLoading) {
+        return <Text color="muted">Loading...</Text>;
+    }
+
+    if (transactions.length === 0) {
+        return (
+            <View style={styles.emptyState}>
+                <Text style={styles.emptyIcon}>💸</Text>
+                <Text color="muted">No transactions yet</Text>
+            </View>
+        );
+    }
 
     return (
-        <View style={styles.section}>
-            <Text variant="subtitle">Recent Transactions</Text>
-            {transactionsLoading ? (
-                <Text color="muted">Loading...</Text>
-            ) : transactions.length === 0 ? (
-                <View style={styles.emptyState}>
-                    <Text style={styles.emptyIcon}>💸</Text>
-                    <Text color="muted">No transactions yet</Text>
-                </View>
-            ) : (
-                <Box radius={theme.radii.md} surface="elevated">
-                    {transactions.map((txn) => {
-                        const isIncome = txn.type === "income";
+        <Box radius={theme.radii.md} surface="elevated" paddingX="md">
+            {transactions.map((txn) => {
+                const isIncome = txn.type === "income";
 
-                        return (
-                            <Box
-                                key={txn.id}
-                                direction="row"
-                                align="center"
-                                paddingX="md"
-                                paddingY="sm"
-                            >
-                                <View style={styles.transactionLeft}>
-                                    <View
-                                        style={[
-                                            styles.categoryIcon,
-                                            {
-                                                backgroundColor: `${txn.category.color}20`,
-                                            },
-                                        ]}
-                                    >
-                                        <Text>{txn.category.icon}</Text>
-                                    </View>
-                                    <View>
-                                        <Text variant="bodySemibold">
-                                            {txn.category.name}
-                                        </Text>
-                                        <Text variant="hint" color="muted">
-                                            {formatDate(txn.date)}
-                                        </Text>
-                                    </View>
-                                </View>
-                                <Text
-                                    variant="amount"
-                                    color={isIncome ? "success" : "danger"}
+                return (
+                    <>
+                        <Box
+                            key={txn.id}
+                            direction="row"
+                            align="center"
+                            paddingY="md"
+                        >
+                            <View style={styles.transactionLeft}>
+                                <View
+                                    style={[
+                                        styles.categoryIcon,
+                                        {
+                                            backgroundColor: `${txn.category.color}20`,
+                                        },
+                                    ]}
                                 >
-                                    {isIncome ? "+" : "-"}
-                                    {formatCurrency(txn.amount)}
-                                </Text>
-                            </Box>
-                        );
-                    })}
-                </Box>
-            )}
-        </View>
+                                    <Text>{txn.category.icon}</Text>
+                                </View>
+                                <View>
+                                    <Text variant="bodySemibold">
+                                        {txn.category.name}
+                                    </Text>
+                                    <Text variant="hint" color="muted">
+                                        {formatDate(txn.date)}
+                                    </Text>
+                                </View>
+                            </View>
+                            <Text
+                                variant="bodySemibold"
+                                color={isIncome ? "success" : "danger"}
+                            >
+                                {isIncome ? "+" : "-"}
+                                {formatCurrency(txn.amount)}
+                            </Text>
+                        </Box>
+                    </>
+                );
+            })}
+        </Box>
     );
 };
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
-        section: {
-            rowGap: theme.spacing[2],
-        },
         emptyState: {
             alignItems: "center",
             paddingVertical: theme.spacing[10],
@@ -95,8 +93,8 @@ const useStyles = createThemedStyles((theme) =>
             borderRadius: theme.radii.full,
             alignItems: "center",
             justifyContent: "center",
-            width: 40,
-            height: 40,
+            width: 32,
+            height: 32,
         },
     }),
 );

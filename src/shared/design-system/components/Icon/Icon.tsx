@@ -3,7 +3,7 @@ import type { StyleProp, TextStyle } from "react-native";
 
 import { useTheme } from "../../hooks/use-theme";
 import type { ThemeFgColors } from "../../theme/theme.types";
-import { IconSymbol } from "@components/ui/icon-symbol";
+import { IconSymbol } from "./icon-symbol";
 
 type IconColorKey = keyof ThemeFgColors;
 

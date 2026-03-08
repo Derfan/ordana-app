@@ -12,7 +12,7 @@ import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
-import { ErrorBoundary } from "@components/error-boundary";
+import { ErrorBoundary } from "@shared/components";
 import { db } from "@db/client";
 import { seedDatabase } from "@db/seed";
 import { useColorScheme } from "@hooks/use-color-scheme";

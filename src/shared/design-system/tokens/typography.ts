@@ -137,12 +137,12 @@ export const typographyVariants = {
     },
     amountLarge: {
         fontSize: scale.fontSize.xl, // 20 — account balance
-        lineHeight: scale.lineHeight.display,
+        lineHeight: scale.lineHeight.loose,
         fontWeight: scale.fontWeight.bold,
     },
     amountInput: {
         fontSize: scale.fontSize["2xl"], // 24 — amount text input
-        lineHeight: scale.lineHeight.display,
+        lineHeight: scale.lineHeight.loose,
         fontWeight: scale.fontWeight.semibold,
     },
 

@@ -9,12 +9,12 @@ import {
 } from "react-native";
 import { z } from "zod";
 
-import { BaseModal } from "@components/ui/base-modal";
 import {
     Button,
     FormField,
     Text,
     View,
+    Modal,
     createThemedStyles,
     useModalFormStyles,
     useTheme,
@@ -128,7 +128,7 @@ export function AddTransactionModal({
     };
 
     return (
-        <BaseModal
+        <Modal
             title="New Transaction"
             visible={visible}
             onClose={handleClose}
@@ -370,7 +370,7 @@ export function AddTransactionModal({
                     onPress={handleSubmit(onValid)}
                 />
             </View>
-        </BaseModal>
+        </Modal>
     );
 }
 
