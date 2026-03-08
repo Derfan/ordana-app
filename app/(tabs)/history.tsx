@@ -1,24 +1,31 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { TransactionsList } from "@features/transactions";
-import { useThemeColor } from "@hooks/use-theme-color";
+import { createThemedStyles, Text } from "@shared/design-system";
 
 export default function HistoryScreen() {
-    const backgroundColor = useThemeColor({}, "background");
+    const styles = useStyles();
 
     return (
-        <SafeAreaView
-            style={[styles.container, { backgroundColor }]}
-            edges={["top", "left", "right"]}
-        >
-            <TransactionsList />
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.content}>
+                <Text variant="heading1">History</Text>
+
+                <TransactionsList />
+            </View>
         </SafeAreaView>
     );
 }
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-});
+const useStyles = createThemedStyles((theme) =>
+    StyleSheet.create({
+        safeArea: {
+            flex: 1,
+        },
+        content: {
+            rowGap: theme.spacing[5],
+            marginHorizontal: theme.spacing[4],
+        },
+    }),
+);

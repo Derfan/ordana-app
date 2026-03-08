@@ -34,10 +34,6 @@ export function TransactionsList() {
         setIsRefreshing(false);
     };
 
-    const handleAddTransaction = async (data: any) => {
-        await addTransaction(data);
-    };
-
     const handleDeleteTransaction = (id: number) => {
         Alert.alert(
             "Delete Transaction",
@@ -82,91 +78,66 @@ export function TransactionsList() {
         );
     }
 
-    return (
-        <View surface="page" style={styles.container}>
-            <View surface="page" style={styles.header}>
-                <Text variant="heading1">History</Text>
-                <Button
-                    variant="primary"
-                    size="sm"
-                    label="+ Add"
-                    onPress={() => setIsModalVisible(true)}
-                />
+    if (isLoading && transactions.length === 0) {
+        return (
+            <View surface="page" style={styles.centerContainer}>
+                <ActivityIndicator size="large" />
+                <Text style={styles.loadingText}>Loading transactions...</Text>
             </View>
+        );
+    }
 
-            {isLoading && transactions.length === 0 ? (
-                <View surface="page" style={styles.centerContainer}>
-                    <ActivityIndicator size="large" />
-                    <Text style={styles.loadingText}>
-                        Loading transactions...
-                    </Text>
-                </View>
-            ) : (
-                <FlatList
-                    data={transactions}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }) => (
-                        <TransactionCard
-                            transaction={item}
-                            onLongPress={() => handleDeleteTransaction(item.id)}
+    return (
+        <>
+            <FlatList
+                data={transactions}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                    <TransactionCard
+                        transaction={item}
+                        onLongPress={() => handleDeleteTransaction(item.id)}
+                    />
+                )}
+                contentContainerStyle={styles.listContent}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                    <View
+                        colorValue="transparent"
+                        style={styles.emptyContainer}
+                    >
+                        <Text style={styles.emptyIcon}>💸</Text>
+                        <Text variant="heading3">No Transactions</Text>
+                        <Text style={styles.emptyText}>
+                            Start tracking your finances by adding your first
+                            transaction
+                        </Text>
+                        <Button
+                            variant="primary"
+                            size="lg"
+                            label="Add Transaction"
+                            onPress={() => setIsModalVisible(true)}
                         />
-                    )}
-                    contentContainerStyle={styles.listContent}
-                    showsVerticalScrollIndicator={false}
-                    ListEmptyComponent={
-                        <View
-                            colorValue="transparent"
-                            style={styles.emptyContainer}
-                        >
-                            <Text style={styles.emptyIcon}>💸</Text>
-                            <Text variant="heading3">No Transactions</Text>
-                            <Text style={styles.emptyText}>
-                                Start tracking your finances by adding your
-                                first transaction
-                            </Text>
-                            <Button
-                                variant="primary"
-                                size="lg"
-                                label="Add Transaction"
-                                onPress={() => setIsModalVisible(true)}
-                            />
-                        </View>
-                    }
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={isRefreshing}
-                            onRefresh={handleRefresh}
-                        />
-                    }
-                />
-            )}
+                    </View>
+                }
+                refreshControl={
+                    <RefreshControl
+                        refreshing={isRefreshing}
+                        onRefresh={handleRefresh}
+                    />
+                }
+            />
 
             <AddTransactionModal
                 visible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}
-                onSubmit={handleAddTransaction}
+                onSubmit={addTransaction}
             />
-        </View>
+        </>
     );
 }
 
 const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
-        container: {
-            flex: 1,
-        },
-        header: {
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: theme.spacing[5],
-            paddingBottom: theme.spacing[4],
-        },
-        listContent: {
-            padding: theme.spacing[5],
-            paddingTop: 0,
-            paddingBottom: theme.spacing[10],
-        },
         centerContainer: {
             flex: 1,
             justifyContent: "center",
@@ -200,6 +171,9 @@ const useStyles = createThemedStyles((theme) =>
             textAlign: "center",
             marginBottom: theme.spacing[4],
             paddingHorizontal: theme.spacing[10],
+        },
+        listContent: {
+            rowGap: theme.spacing[3],
         },
     }),
 );

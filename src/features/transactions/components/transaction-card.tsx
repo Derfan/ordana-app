@@ -97,8 +97,6 @@ const useStyles = createThemedStyles((theme) =>
     StyleSheet.create({
         card: {
             borderRadius: theme.radii.md,
-            overflow: "hidden",
-            marginBottom: theme.spacing[3],
         },
         cardPressed: {
             opacity: 0.7,
