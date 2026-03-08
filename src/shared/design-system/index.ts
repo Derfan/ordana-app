@@ -32,6 +32,13 @@ export {
     useModalFormStyles,
     AppBottomSheet,
     useBottomSheetControls,
+    Box,
+    Stack,
+    VStack,
+    HStack,
+    Spacer,
+    resolveSpacing,
+    spacingAliasMap,
 } from "./components";
 export type {
     DSTextProps,
@@ -49,6 +56,11 @@ export type {
     FormFieldProps,
     AppBottomSheetProps,
     AppBottomSheetHandle,
+    BoxProps,
+    StackProps,
+    SpacerProps,
+    SpacingProp,
+    SpacingAlias,
 } from "./components";
 
 // ─── Tokens ───────────────────────────────────────────────────────────────────
