@@ -1,2 +1,2 @@
-export { ErrorBoundary } from "./error-boundary";
-export { HapticTab } from "./haptic-tab";
+export { ErrorBoundary } from './error-boundary';
+export { HapticTab } from './haptic-tab';

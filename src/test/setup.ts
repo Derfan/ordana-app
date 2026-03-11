@@ -1,4 +1,4 @@
-import { afterAll, beforeAll } from "vitest";
+import { afterAll, beforeAll } from 'vitest';
 
 // Global test setup for Vitest
 // @testing-library/jest-native is intentionally NOT imported here.
@@ -11,30 +11,30 @@ import { afterAll, beforeAll } from "vitest";
 // inside the individual test file AFTER the react-native alias is active.
 
 const SUPPRESSED_WARNINGS = [
-    "Warning: ReactDOM.render is no longer supported",
-    "Warning: An update to",
-    "Warning: Each child in a list",
-    "act(...) is not supported in production",
+  'Warning: ReactDOM.render is no longer supported',
+  'Warning: An update to',
+  'Warning: Each child in a list',
+  'act(...) is not supported in production',
 ];
 
 const originalWarn = console.warn.bind(console);
 const originalError = console.error.bind(console);
 
 beforeAll(() => {
-    console.warn = (...args: unknown[]) => {
-        const msg = typeof args[0] === "string" ? args[0] : "";
-        if (SUPPRESSED_WARNINGS.some((w) => msg.includes(w))) return;
-        originalWarn(...args);
-    };
+  console.warn = (...args: unknown[]) => {
+    const msg = typeof args[0] === 'string' ? args[0] : '';
+    if (SUPPRESSED_WARNINGS.some((w) => msg.includes(w))) return;
+    originalWarn(...args);
+  };
 
-    console.error = (...args: unknown[]) => {
-        const msg = typeof args[0] === "string" ? args[0] : "";
-        if (SUPPRESSED_WARNINGS.some((w) => msg.includes(w))) return;
-        originalError(...args);
-    };
+  console.error = (...args: unknown[]) => {
+    const msg = typeof args[0] === 'string' ? args[0] : '';
+    if (SUPPRESSED_WARNINGS.some((w) => msg.includes(w))) return;
+    originalError(...args);
+  };
 });
 
 afterAll(() => {
-    console.warn = originalWarn;
-    console.error = originalError;
+  console.warn = originalWarn;
+  console.error = originalError;
 });

@@ -1,36 +1,34 @@
 export interface BaseEntity {
-    id: number;
+  id: number;
 }
 
 export interface AsyncState<T> {
-    data: T | null;
-    isLoading: boolean;
-    error: string | null;
+  data: T | null;
+  isLoading: boolean;
+  error: string | null;
 }
 
-export type Result<T, E = Error> =
-    | { success: true; data: T }
-    | { success: false; error: E };
+export type Result<T, E = Error> = { success: true; data: T } | { success: false; error: E };
 
 export interface PaginationParams {
-    page: number;
-    limit: number;
+  page: number;
+  limit: number;
 }
 
 export interface PaginatedResult<T> {
-    items: T[];
-    total: number;
-    page: number;
-    totalPages: number;
+  items: T[];
+  total: number;
+  page: number;
+  totalPages: number;
 }
 
 export interface SortParams<T> {
-    field: keyof T;
-    direction: "asc" | "desc";
+  field: keyof T;
+  direction: 'asc' | 'desc';
 }
 
 export interface FilterParams {
-    search?: string;
-    dateFrom?: Date;
-    dateTo?: Date;
+  search?: string;
+  dateFrom?: Date;
+  dateTo?: Date;
 }

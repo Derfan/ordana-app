@@ -1,9 +1,9 @@
-import { useMemo } from "react";
-import { StyleSheet } from "react-native";
+import { useMemo } from 'react';
+import { StyleSheet } from 'react-native';
 
-import { darkTheme, lightTheme } from "../theme";
-import type { Theme } from "../theme/theme.types";
-import { useColorScheme } from "./use-color-scheme";
+import { darkTheme, lightTheme } from '../theme';
+import type { Theme } from '../theme/theme.types';
+import { useColorScheme } from './use-color-scheme';
 
 /**
  * A factory function that receives the active Theme and returns a plain styles
@@ -73,20 +73,19 @@ type StylesFactory<T extends StyleSheet.NamedStyles<T>> = (theme: Theme) => T;
  *       }
  */
 export function createThemedStyles<T extends StyleSheet.NamedStyles<T>>(
-    factory: StylesFactory<T>,
+  factory: StylesFactory<T>,
 ): () => T {
-    return function useThemedStyles(): T {
-        const colorScheme = useColorScheme();
+  return function useThemedStyles(): T {
+    const colorScheme = useColorScheme();
 
-        // Resolve the theme from the scheme string — this is the same logic as
-        // useTheme() but kept inline so `colorScheme` is the sole memo dependency.
-        // Memoizing on a stable string primitive instead of the theme object
-        // reference satisfies exhaustive-deps without capturing a new object
-        // identity on every render.
-        return useMemo(() => {
-            const theme: Theme =
-                colorScheme === "dark" ? darkTheme : lightTheme;
-            return factory(theme);
-        }, [colorScheme]);
-    };
+    // Resolve the theme from the scheme string — this is the same logic as
+    // useTheme() but kept inline so `colorScheme` is the sole memo dependency.
+    // Memoizing on a stable string primitive instead of the theme object
+    // reference satisfies exhaustive-deps without capturing a new object
+    // identity on every render.
+    return useMemo(() => {
+      const theme: Theme = colorScheme === 'dark' ? darkTheme : lightTheme;
+      return factory(theme);
+    }, [colorScheme]);
+  };
 }

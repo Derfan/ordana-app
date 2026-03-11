@@ -1,6 +1,5 @@
-import { desc, eq } from 'drizzle-orm';
-
 import { categories, db } from '@db/client';
+import { desc, eq } from 'drizzle-orm';
 
 export type Category = typeof categories.$inferSelect;
 export type NewCategory = typeof categories.$inferInsert;
@@ -37,11 +36,7 @@ export class CategoryRepository {
   }
 
   async update(id: number, data: Partial<NewCategory>): Promise<Category> {
-    const result = await db
-      .update(categories)
-      .set(data)
-      .where(eq(categories.id, id))
-      .returning();
+    const result = await db.update(categories).set(data).where(eq(categories.id, id)).returning();
 
     return result[0];
   }

@@ -1,6 +1,5 @@
-import { desc, eq } from 'drizzle-orm';
-
 import { accounts, db } from '@db/client';
+import { desc, eq } from 'drizzle-orm';
 
 export type Account = typeof accounts.$inferSelect;
 export type NewAccount = typeof accounts.$inferInsert;
@@ -22,11 +21,7 @@ export class AccountRepository {
   }
 
   async update(id: number, data: Partial<NewAccount>): Promise<Account> {
-    const result = await db
-      .update(accounts)
-      .set(data)
-      .where(eq(accounts.id, id))
-      .returning();
+    const result = await db.update(accounts).set(data).where(eq(accounts.id, id)).returning();
 
     return result[0];
   }

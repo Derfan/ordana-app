@@ -55,11 +55,19 @@ export const Animated = {
   ScrollView: noop,
   Value: class {
     _value: number;
-    constructor(value: number) { this._value = value; }
-    setValue(v: number) { this._value = v; }
-    addListener() { return { id: '0' }; }
+    constructor(value: number) {
+      this._value = value;
+    }
+    setValue(v: number) {
+      this._value = v;
+    }
+    addListener() {
+      return { id: '0' };
+    }
     removeListener() {}
-    interpolate() { return this; }
+    interpolate() {
+      return this;
+    }
   },
   ValueXY: class {
     x = { _value: 0 };

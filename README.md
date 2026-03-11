@@ -16,24 +16,28 @@
 ## 📱 Features
 
 ### 💳 **Account Management**
+
 - Create and manage multiple accounts
 - Track real-time balances across all accounts
 - View total balance at a glance
 - Support for different account types
 
 ### 📊 **Transaction Tracking**
+
 - Record income and expenses
 - Categorize transactions for better insights
 - Add notes and descriptions
 - Smart date-based filtering
 
 ### 🎯 **Category System**
+
 - Flexible category management for income and expenses
 - Customizable icons and colors
 - Pre-defined system categories
 - Create custom categories for your needs
 
 ### 📈 **Analytics & Insights**
+
 - Interactive pie charts for spending analysis
 - Category-based spending breakdown
 - Percentage distribution visualization
@@ -44,26 +48,31 @@
 ## 🛠️ Tech Stack
 
 ### **Core**
+
 - **React Native** - Cross-platform mobile framework
 - **Expo** - Development platform and toolchain
 - **TypeScript** - Type-safe development
 - **Expo Router** - File-based navigation
 
 ### **State Management**
+
 - **Zustand** - Lightweight state management
 - **React Hooks** - Local state and effects
 
 ### **Database**
+
 - **Expo SQLite** - Local database storage
 - **Drizzle ORM** - Type-safe database queries and migrations
 - **Repository Pattern** - Clean data access layer
 
 ### **UI Components**
+
 - **React Native Gifted Charts** - Beautiful data visualizations
 - **Expo Symbols** - Native SF Symbols integration
 - **Themed Components** - Dark/light mode support
 
 ### **Development**
+
 - **ESLint** - Code linting
 - **Babel** - JavaScript compilation
 - **Metro** - React Native bundler
@@ -82,17 +91,20 @@
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Derfan/ordana-app.git
    cd ordana-app
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Start the development server**
+
    ```bash
    pnpm start
    ```
@@ -143,21 +155,26 @@ ordana-app/
 ## 🗄️ Database Schema
 
 ### **Accounts**
+
 - Stores user's financial accounts (bank accounts, wallets, etc.)
 - Tracks current balance for each account
 
 ### **Categories**
+
 - Income and expense categories
 - Customizable icons and colors
 - System and user-defined categories
 
 ### **Transactions**
+
 - Complete transaction records
 - Links to accounts and categories
 - Timestamps and descriptions
 
 ### **Migrations**
+
 Managed by Drizzle Kit:
+
 ```bash
 pnpm run db:generate  # Generate migration files
 pnpm run db:studio    # Open Drizzle Studio
@@ -167,34 +184,39 @@ pnpm run db:studio    # Open Drizzle Studio
 
 ## 📋 Available Scripts
 
-| Command | Description |
-|---------|-------------|
-| `pnpm start` | Start Expo development server |
-| `pnpm run android` | Run on Android emulator |
-| `pnpm run ios` | Run on iOS simulator |
-| `pnpm run web` | Run in web browser |
-| `pnpm run lint` | Run ESLint |
-| `pnpm run db:generate` | Generate database migrations |
-| `pnpm run db:studio` | Open Drizzle Studio UI |
-| `pnpm run db:check` | Check migration consistency |
+| Command                | Description                   |
+| ---------------------- | ----------------------------- |
+| `pnpm start`           | Start Expo development server |
+| `pnpm run android`     | Run on Android emulator       |
+| `pnpm run ios`         | Run on iOS simulator          |
+| `pnpm run web`         | Run in web browser            |
+| `pnpm run lint`        | Run ESLint                    |
+| `pnpm run db:generate` | Generate database migrations  |
+| `pnpm run db:studio`   | Open Drizzle Studio UI        |
+| `pnpm run db:check`    | Check migration consistency   |
 
 ---
 
 ## 🎨 Key Features Explained
 
 ### **Themed Components**
+
 The app supports both light and dark modes with automatic theme switching based on system preferences.
 
 ### **Repository Pattern**
+
 Clean separation of data access logic using repository pattern for maintainable and testable code.
 
 ### **Feature-Based Architecture**
+
 Code organized by features (accounts, transactions, categories) for better scalability and maintainability.
 
 ### **Type Safety**
+
 Full TypeScript implementation with strict type checking for reduced runtime errors.
 
 ### **Responsive Design**
+
 Optimized layouts for different screen sizes and orientations.
 
 ---

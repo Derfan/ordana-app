@@ -1,23 +1,17 @@
 import {
-    BottomSheetBackdrop,
-    BottomSheetModal,
-    BottomSheetScrollView,
-    useBottomSheetModal,
-    type BottomSheetBackdropProps,
-    type BottomSheetModalProps,
-} from "@gorhom/bottom-sheet";
-import {
-    type ReactNode,
-    forwardRef,
-    useCallback,
-    useImperativeHandle,
-    useRef,
-} from "react";
-import { Pressable, StyleSheet } from "react-native";
+  BottomSheetBackdrop,
+  type BottomSheetBackdropProps,
+  BottomSheetModal,
+  type BottomSheetModalProps,
+  BottomSheetScrollView,
+  useBottomSheetModal,
+} from '@gorhom/bottom-sheet';
+import { forwardRef, type ReactNode, useCallback, useImperativeHandle, useRef } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 
-import { useTheme } from "../../hooks/use-theme";
-import { Text } from "../Text/Text";
-import { View } from "../View/View";
+import { useTheme } from '../../hooks/use-theme';
+import { Text } from '../Text/Text';
+import { View } from '../View/View';
 
 /**
  * The imperative handle exposed via `ref` on `AppBottomSheet`.
@@ -25,8 +19,8 @@ import { View } from "../View/View";
  * else (snapToIndex, expand, etc.) can be added here if ever needed.
  */
 export interface AppBottomSheetHandle {
-    open: () => void;
-    close: () => void;
+  open: () => void;
+  close: () => void;
 }
 
 /**
@@ -46,40 +40,36 @@ export interface AppBottomSheetHandle {
  * - Co-locates the type so callers never import `AppBottomSheetHandle` directly.
  */
 export function useBottomSheetControls() {
-    const ref = useRef<AppBottomSheetHandle>(null);
+  const ref = useRef<AppBottomSheetHandle>(null);
 
-    const open = useCallback(() => {
-        ref.current?.open();
-    }, []);
+  const open = useCallback(() => {
+    ref.current?.open();
+  }, []);
 
-    const close = useCallback(() => {
-        ref.current?.close();
-    }, []);
+  const close = useCallback(() => {
+    ref.current?.close();
+  }, []);
 
-    return { ref, open, close } as const;
+  return { ref, open, close } as const;
 }
 
 export interface AppBottomSheetProps extends Omit<
-    BottomSheetModalProps,
-    | "ref"
-    | "children"
-    | "backgroundStyle"
-    | "handleIndicatorStyle"
-    | "backdropComponent"
+  BottomSheetModalProps,
+  'ref' | 'children' | 'backgroundStyle' | 'handleIndicatorStyle' | 'backdropComponent'
 > {
-    /** Sheet title displayed in the drag-handle header row. */
-    title: string;
-    children: ReactNode;
-    /**
-     * When true the close button and pan-to-dismiss are disabled.
-     * Use during async operations to prevent accidental dismissal.
-     */
-    isSubmitting?: boolean;
-    /**
-     * Snap points passed directly to BottomSheetModal.
-     * @default ["85%"]
-     */
-    snapPoints?: BottomSheetModalProps["snapPoints"];
+  /** Sheet title displayed in the drag-handle header row. */
+  title: string;
+  children: ReactNode;
+  /**
+   * When true the close button and pan-to-dismiss are disabled.
+   * Use during async operations to prevent accidental dismissal.
+   */
+  isSubmitting?: boolean;
+  /**
+   * Snap points passed directly to BottomSheetModal.
+   * @default ["85%"]
+   */
+  snapPoints?: BottomSheetModalProps['snapPoints'];
 }
 
 /**
@@ -90,27 +80,23 @@ export interface AppBottomSheetProps extends Omit<
  * BottomSheetModal, not in the parent that renders it).
  */
 function CloseButton({ disabled }: { disabled: boolean }) {
-    const theme = useTheme();
-    const { dismiss } = useBottomSheetModal();
+  const theme = useTheme();
+  const { dismiss } = useBottomSheetModal();
 
-    return (
-        <Pressable
-            onPress={() => dismiss()}
-            disabled={disabled}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            style={({ pressed }) => pressed && styles.closeButtonPressed}
-            accessibilityRole="button"
-            accessibilityLabel="Close"
-        >
-            <Text
-                variant="body"
-                colorValue={theme.colors.fg.icon}
-                style={styles.closeButtonText}
-            >
-                ✕
-            </Text>
-        </Pressable>
-    );
+  return (
+    <Pressable
+      onPress={() => dismiss()}
+      disabled={disabled}
+      hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+      style={({ pressed }) => pressed && styles.closeButtonPressed}
+      accessibilityRole="button"
+      accessibilityLabel="Close"
+    >
+      <Text variant="body" colorValue={theme.colors.fg.icon} style={styles.closeButtonText}>
+        ✕
+      </Text>
+    </Pressable>
+  );
 }
 
 /**
@@ -139,114 +125,106 @@ function CloseButton({ disabled }: { disabled: boolean }) {
  *   inputs are never hidden; `keyboardBlurBehavior="restore"` returns it to
  *   the snap point when the keyboard closes.
  */
-export const AppBottomSheet = forwardRef<
-    AppBottomSheetHandle,
-    AppBottomSheetProps
->(function AppBottomSheet(
-    {
-        title,
-        children,
-        isSubmitting = false,
-        snapPoints = ["85%"],
-        onDismiss,
-        ...sheetProps
-    },
+export const AppBottomSheet = forwardRef<AppBottomSheetHandle, AppBottomSheetProps>(
+  function AppBottomSheet(
+    { title, children, isSubmitting = false, snapPoints = ['85%'], onDismiss, ...sheetProps },
     ref,
-) {
+  ) {
     const theme = useTheme();
     const sheetRef = useRef<BottomSheetModal>(null);
 
     useImperativeHandle(
-        ref,
-        () => ({
-            open: () => sheetRef.current?.present(),
-            close: () => sheetRef.current?.dismiss(),
-        }),
-        [],
+      ref,
+      () => ({
+        open: () => sheetRef.current?.present(),
+        close: () => sheetRef.current?.dismiss(),
+      }),
+      [],
     );
 
     const handleDismiss = useCallback(() => {
-        onDismiss?.();
+      onDismiss?.();
     }, [onDismiss]);
 
     const renderBackdrop = useCallback(
-        (props: BottomSheetBackdropProps) => (
-            <BottomSheetBackdrop
-                {...props}
-                disappearsOnIndex={-1}
-                appearsOnIndex={0}
-                opacity={0.5}
-                pressBehavior={isSubmitting ? "none" : "close"}
-            />
-        ),
-        [isSubmitting],
+      (props: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...props}
+          disappearsOnIndex={-1}
+          appearsOnIndex={0}
+          opacity={0.5}
+          pressBehavior={isSubmitting ? 'none' : 'close'}
+        />
+      ),
+      [isSubmitting],
     );
 
     const backgroundStyle = {
-        backgroundColor: theme.colors.bg.page,
-        borderTopLeftRadius: theme.radii.iconCircle,
-        borderTopRightRadius: theme.radii.iconCircle,
+      backgroundColor: theme.colors.bg.page,
+      borderTopLeftRadius: theme.radii.iconCircle,
+      borderTopRightRadius: theme.radii.iconCircle,
     };
 
     const handleIndicatorStyle = {
-        backgroundColor: theme.colors.border.subtle,
-        width: 40,
-        height: 4,
+      backgroundColor: theme.colors.border.subtle,
+      width: 40,
+      height: 4,
     };
 
     return (
-        <BottomSheetModal
-            ref={sheetRef}
-            snapPoints={snapPoints}
-            onDismiss={handleDismiss}
-            enablePanDownToClose={!isSubmitting}
-            keyboardBehavior="extend"
-            keyboardBlurBehavior="restore"
-            android_keyboardInputMode="adjustResize"
-            backgroundStyle={backgroundStyle}
-            handleIndicatorStyle={handleIndicatorStyle}
-            backdropComponent={renderBackdrop}
-            {...sheetProps}
+      <BottomSheetModal
+        ref={sheetRef}
+        snapPoints={snapPoints}
+        onDismiss={handleDismiss}
+        enablePanDownToClose={!isSubmitting}
+        keyboardBehavior="extend"
+        keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustResize"
+        backgroundStyle={backgroundStyle}
+        handleIndicatorStyle={handleIndicatorStyle}
+        backdropComponent={renderBackdrop}
+        {...sheetProps}
+      >
+        <BottomSheetScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            {
+              paddingHorizontal: theme.spacing[5],
+              paddingBottom: theme.spacing[10],
+            },
+          ]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-            <BottomSheetScrollView
-                contentContainerStyle={[
-                    styles.scrollContent,
-                    {
-                        paddingHorizontal: theme.spacing[5],
-                        paddingBottom: theme.spacing[10],
-                    },
-                ]}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-            >
-                <View
-                    colorValue="transparent"
-                    style={[styles.header, { marginBottom: theme.spacing[6] }]}
-                >
-                    <Text variant="heading2">{title}</Text>
-                    <CloseButton disabled={isSubmitting} />
-                </View>
+          <View
+            colorValue="transparent"
+            style={[styles.header, { marginBottom: theme.spacing[6] }]}
+          >
+            <Text variant="heading2">{title}</Text>
+            <CloseButton disabled={isSubmitting} />
+          </View>
 
-                {children}
-            </BottomSheetScrollView>
-        </BottomSheetModal>
+          {children}
+        </BottomSheetScrollView>
+      </BottomSheetModal>
     );
-});
+  },
+);
 
 const styles = StyleSheet.create({
-    scrollContent: {
-        flexGrow: 1,
-    },
-    header: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-    },
-    closeButtonText: {
-        fontSize: 22,
-        lineHeight: 28,
-    },
-    closeButtonPressed: {
-        opacity: 0.5,
-    },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 22,
+    lineHeight: 28,
+  },
+  closeButtonPressed: {
+    opacity: 0.5,
+  },
 });

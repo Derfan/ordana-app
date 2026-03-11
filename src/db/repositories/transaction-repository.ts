@@ -1,6 +1,5 @@
-import { and, desc, eq, gte, lte, sql } from 'drizzle-orm';
-
 import { accounts, categories, db, transactions } from '@db/client';
+import { and, desc, eq, gte, lte, sql } from 'drizzle-orm';
 
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = typeof transactions.$inferInsert;
@@ -248,7 +247,7 @@ export class TransactionRepository {
   async getCategorySpending(
     startDate: Date,
     endDate: Date,
-    type: 'income' | 'expense' = 'expense'
+    type: 'income' | 'expense' = 'expense',
   ): Promise<CategorySpending[]> {
     const result = await db
       .select({
@@ -265,8 +264,8 @@ export class TransactionRepository {
         and(
           gte(transactions.date, startDate),
           lte(transactions.date, endDate),
-          eq(transactions.type, type)
-        )
+          eq(transactions.type, type),
+        ),
       )
       .groupBy(categories.id, categories.name, categories.icon, categories.color)
       .orderBy(desc(sql`sum(${transactions.amount})`));

@@ -1,15 +1,15 @@
-export { lightTheme } from "./light";
-export { darkTheme } from "./dark";
+export { darkTheme } from './dark';
+export { lightTheme } from './light';
 export type {
-    Theme,
-    ColorScheme,
-    ThemeColors,
-    ThemeFgColors,
-    ThemeBgColors,
-    ThemeBorderColors,
-    ThemeAccentColors,
-    ThemeOverlayColors,
-    ThemeInteractiveColors,
-    ThemeInteractiveVariant,
-    ThemeTabColors,
-} from "./theme.types";
+  ColorScheme,
+  Theme,
+  ThemeAccentColors,
+  ThemeBgColors,
+  ThemeBorderColors,
+  ThemeColors,
+  ThemeFgColors,
+  ThemeInteractiveColors,
+  ThemeInteractiveVariant,
+  ThemeOverlayColors,
+  ThemeTabColors,
+} from './theme.types';

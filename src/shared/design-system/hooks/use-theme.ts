@@ -1,6 +1,6 @@
-import { darkTheme, lightTheme } from "../theme";
-import { useColorScheme } from "./use-color-scheme";
-import type { Theme } from "../theme/theme.types";
+import { darkTheme, lightTheme } from '../theme';
+import type { Theme } from '../theme/theme.types';
+import { useColorScheme } from './use-color-scheme';
 
 /**
  * Returns the fully resolved Theme object for the active color scheme.
@@ -15,7 +15,7 @@ import type { Theme } from "../theme/theme.types";
  * they bypass the color scheme resolution and break dark mode.
  */
 export function useTheme(): Theme {
-    const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();
 
-    return colorScheme === "dark" ? darkTheme : lightTheme;
+  return colorScheme === 'dark' ? darkTheme : lightTheme;
 }

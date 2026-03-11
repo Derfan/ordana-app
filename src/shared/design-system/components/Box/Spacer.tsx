@@ -1,26 +1,26 @@
 import { View as RNView } from 'react-native';
 
-import { type SpacingProp, resolveSpacing } from './spacing-alias';
+import { resolveSpacing, type SpacingProp } from './spacing-alias';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface SpacerProps {
-    /**
-     * When provided the Spacer renders a fixed-size blank space equal to the
-     * resolved spacing token value.
-     *
-     * - In a vertical Stack → becomes a fixed `height`
-     * - In a horizontal Stack → becomes a fixed `width`
-     *
-     * When omitted the Spacer is flexible: it grows to fill all remaining space
-     * on the main axis (`flex: 1`). This is the "push siblings apart" pattern.
-     *
-     * Accepts a named alias ("md") or a numeric token key (4):
-     *   <Spacer size="md" />  → 16px fixed gap
-     *   <Spacer size={4} />   → 16px fixed gap
-     *   <Spacer />            → flex: 1, fills remaining space
-     */
-    size?: SpacingProp;
+  /**
+   * When provided the Spacer renders a fixed-size blank space equal to the
+   * resolved spacing token value.
+   *
+   * - In a vertical Stack → becomes a fixed `height`
+   * - In a horizontal Stack → becomes a fixed `width`
+   *
+   * When omitted the Spacer is flexible: it grows to fill all remaining space
+   * on the main axis (`flex: 1`). This is the "push siblings apart" pattern.
+   *
+   * Accepts a named alias ("md") or a numeric token key (4):
+   *   <Spacer size="md" />  → 16px fixed gap
+   *   <Spacer size={4} />   → 16px fixed gap
+   *   <Spacer />            → flex: 1, fills remaining space
+   */
+  size?: SpacingProp;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -63,19 +63,19 @@ export interface SpacerProps {
  * which would break if that child is reused elsewhere without a margin.
  */
 export function Spacer({ size }: SpacerProps) {
-    if (size !== undefined) {
-        const resolvedSize = resolveSpacing(size);
+  if (size !== undefined) {
+    const resolvedSize = resolveSpacing(size);
 
-        return (
-            <RNView
-                style={{
-                    width: resolvedSize,
-                    height: resolvedSize,
-                    flexShrink: 0,
-                }}
-            />
-        );
-    }
+    return (
+      <RNView
+        style={{
+          width: resolvedSize,
+          height: resolvedSize,
+          flexShrink: 0,
+        }}
+      />
+    );
+  }
 
-    return <RNView style={{ flex: 1 }} />;
+  return <RNView style={{ flex: 1 }} />;
 }

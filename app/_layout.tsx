@@ -1,77 +1,68 @@
-import {
-    DarkTheme,
-    DefaultTheme,
-    ThemeProvider,
-} from "@react-navigation/native";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import "react-native-reanimated";
+import 'react-native-reanimated';
 
-import { ErrorBoundary } from "@shared/components";
-import { db } from "@db/client";
-import { seedDatabase } from "@db/seed";
-import { useColorScheme } from "@hooks/use-color-scheme";
+import { db } from '@db/client';
+import { seedDatabase } from '@db/seed';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { useColorScheme } from '@hooks/use-color-scheme';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { ErrorBoundary } from '@shared/components';
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import migrations from "../drizzle/migrations";
+import migrations from '../drizzle/migrations';
 
 export const unstable_settings = {
-    anchor: "(tabs)",
+  anchor: '(tabs)',
 };
 
 export default function RootLayout() {
-    const colorScheme = useColorScheme();
-    const [isSeeded, setIsSeeded] = useState(false);
+  const colorScheme = useColorScheme();
+  const [isSeeded, setIsSeeded] = useState(false);
 
-    const { success, error } = useMigrations(db, migrations);
+  const { success, error } = useMigrations(db, migrations);
 
-    useEffect(() => {
-        if (success && !isSeeded) {
-            seedDatabase()
-                .then(() => {
-                    console.log("[App] Database seeded successfully");
-                    setIsSeeded(true);
-                })
-                .catch((err) => {
-                    console.error("[App] Seeding failed:", err);
-                    setIsSeeded(true);
-                });
-        }
-    }, [success, isSeeded]);
-
-    if (error) {
-        console.error("Migration error:", error);
+  useEffect(() => {
+    if (success && !isSeeded) {
+      seedDatabase()
+        .then(() => {
+          console.log('[App] Database seeded successfully');
+          setIsSeeded(true);
+        })
+        .catch((err) => {
+          console.error('[App] Seeding failed:', err);
+          setIsSeeded(true);
+        });
     }
+  }, [success, isSeeded]);
 
-    if (!success || !isSeeded) return null;
+  if (error) {
+    console.error('Migration error:', error);
+  }
 
-    return (
-        <GestureHandlerRootView style={styles.root}>
-            <ErrorBoundary>
-                <ThemeProvider
-                    value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-                >
-                    <BottomSheetModalProvider>
-                        <Stack>
-                            <Stack.Screen
-                                name="(tabs)"
-                                options={{ headerShown: false }}
-                            />
-                        </Stack>
-                        <StatusBar style="auto" />
-                    </BottomSheetModalProvider>
-                </ThemeProvider>
-            </ErrorBoundary>
-        </GestureHandlerRootView>
-    );
+  if (!success || !isSeeded) return null;
+
+  return (
+    <GestureHandlerRootView style={styles.root}>
+      <ErrorBoundary>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <BottomSheetModalProvider>
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+            <StatusBar style="auto" />
+          </BottomSheetModalProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </GestureHandlerRootView>
+  );
 }
 
 const styles = StyleSheet.create({
-    root: {
-        flex: 1,
-    },
+  root: {
+    flex: 1,
+  },
 });

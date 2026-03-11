@@ -29,7 +29,7 @@ const buildShadow = (
   offsetY: number,
   radius: number,
   opacity: number,
-  elevation: number
+  elevation: number,
 ): Shadow => ({
   // iOS
   shadowColor: '#000000',
@@ -75,7 +75,7 @@ export const buildColoredShadow = (
   offsetY = 2,
   radius = 8,
   opacity = 0.15,
-  elevation = 3
+  elevation = 3,
 ): Shadow => ({
   shadowColor: color,
   shadowOffset: { width: 0, height: offsetY },

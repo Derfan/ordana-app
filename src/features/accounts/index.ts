@@ -1,2 +1,2 @@
-export * from "./components";
-export * from "./services/account.service";
+export * from './components';
+export * from './services/account.service';

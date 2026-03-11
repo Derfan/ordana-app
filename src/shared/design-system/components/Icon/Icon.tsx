@@ -1,72 +1,64 @@
-import type { SymbolViewProps, SymbolWeight } from "expo-symbols";
-import type { StyleProp, TextStyle } from "react-native";
+import type { SymbolViewProps, SymbolWeight } from 'expo-symbols';
+import type { StyleProp, TextStyle } from 'react-native';
 
-import { useTheme } from "../../hooks/use-theme";
-import type { ThemeFgColors } from "../../theme/theme.types";
-import { IconSymbol } from "./icon-symbol";
+import { useTheme } from '../../hooks/use-theme';
+import type { ThemeFgColors } from '../../theme/theme.types';
+import { IconSymbol } from './icon-symbol';
 
 type IconColorKey = keyof ThemeFgColors;
 
 export interface IconProps {
-    /**
-     * SF Symbol name (iOS) / Material Icon name (Android & Web).
-     * Uses the same name space as SF Symbols — the cross-platform mapping
-     * lives in `icon-symbol.tsx`.
-     */
-    name: SymbolViewProps["name"];
+  /**
+   * SF Symbol name (iOS) / Material Icon name (Android & Web).
+   * Uses the same name space as SF Symbols — the cross-platform mapping
+   * lives in `icon-symbol.tsx`.
+   */
+  name: SymbolViewProps['name'];
 
-    /**
-     * Rendered size in dp (width & height are equal).
-     * @default 24
-     */
-    size?: number;
+  /**
+   * Rendered size in dp (width & height are equal).
+   * @default 24
+   */
+  size?: number;
 
-    /**
-     * Semantic icon color key from `theme.colors.fg`.
-     * Resolves correctly for the active color scheme.
-     * @default 'icon'
-     */
-    color?: IconColorKey;
+  /**
+   * Semantic icon color key from `theme.colors.fg`.
+   * Resolves correctly for the active color scheme.
+   * @default 'icon'
+   */
+  color?: IconColorKey;
 
-    /**
-     * Escape hatch for one-off color overrides (e.g. dynamic category colors
-     * that come from the database and can't be mapped to a semantic token).
-     * When provided, takes precedence over `color`.
-     */
-    colorValue?: string;
+  /**
+   * Escape hatch for one-off color overrides (e.g. dynamic category colors
+   * that come from the database and can't be mapped to a semantic token).
+   * When provided, takes precedence over `color`.
+   */
+  colorValue?: string;
 
-    /**
-     * SF Symbol stroke weight (iOS only, ignored on other platforms).
-     * @default 'regular'
-     */
-    weight?: SymbolWeight;
+  /**
+   * SF Symbol stroke weight (iOS only, ignored on other platforms).
+   * @default 'regular'
+   */
+  weight?: SymbolWeight;
 
-    /**
-     * Layout style applied to the icon. TextStyle is the common denominator
-     * between iOS (SymbolView/ViewStyle) and Android/web (MaterialIcons/TextStyle).
-     */
-    style?: StyleProp<TextStyle>;
+  /**
+   * Layout style applied to the icon. TextStyle is the common denominator
+   * between iOS (SymbolView/ViewStyle) and Android/web (MaterialIcons/TextStyle).
+   */
+  style?: StyleProp<TextStyle>;
 }
 
 export function Icon({
-    name,
-    size = 24,
-    color = "icon",
-    colorValue,
-    weight = "regular",
-    style,
+  name,
+  size = 24,
+  color = 'icon',
+  colorValue,
+  weight = 'regular',
+  style,
 }: IconProps) {
-    const theme = useTheme();
+  const theme = useTheme();
 
-    const resolvedColor = colorValue ?? theme.colors.fg[color];
+  const resolvedColor = colorValue ?? theme.colors.fg[color];
 
-    return (
-        <IconSymbol
-            name={name}
-            size={size}
-            color={resolvedColor}
-            weight={weight}
-            style={style}
-        />
-    );
+  return <IconSymbol name={name} size={size} color={resolvedColor} weight={weight} style={style} />;
 }
