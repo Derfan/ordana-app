@@ -29,32 +29,30 @@ export const RecentTransactionsList = () => {
         const isIncome = txn.type === 'income';
 
         return (
-          <>
-            <Box key={txn.id} direction="row" align="center" paddingY="md">
-              <View style={styles.transactionLeft}>
-                <View
-                  style={[
-                    styles.categoryIcon,
-                    {
-                      backgroundColor: `${txn.category.color}20`,
-                    },
-                  ]}
-                >
-                  <Text>{txn.category.icon}</Text>
-                </View>
-                <View>
-                  <Text variant="bodySemibold">{txn.category.name}</Text>
-                  <Text variant="hint" color="muted">
-                    {formatDate(txn.date)}
-                  </Text>
-                </View>
+          <Box key={txn.id} direction="row" align="center" paddingY="md">
+            <View style={styles.transactionLeft}>
+              <View
+                style={[
+                  styles.categoryIcon,
+                  {
+                    backgroundColor: `${txn.category.color}20`,
+                  },
+                ]}
+              >
+                <Text>{txn.category.icon}</Text>
               </View>
-              <Text variant="bodySemibold" color={isIncome ? 'success' : 'danger'}>
-                {isIncome ? '+' : '-'}
-                {formatCurrency(txn.amount)}
-              </Text>
-            </Box>
-          </>
+              <View>
+                <Text variant="bodySemibold">{txn.category.name}</Text>
+                <Text variant="hint" color="muted">
+                  {formatDate(txn.date)}
+                </Text>
+              </View>
+            </View>
+            <Text variant="bodySemibold" color={isIncome ? 'success' : 'danger'}>
+              {isIncome ? '+' : '-'}
+              {formatCurrency(txn.amount)}
+            </Text>
+          </Box>
         );
       })}
     </Box>
