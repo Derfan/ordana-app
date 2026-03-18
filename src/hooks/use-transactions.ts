@@ -1,8 +1,9 @@
-import type { TransactionWithDetails } from '@db/repositories';
 import { useAppStateActive } from '@hooks/use-app-state';
 import { useTransactionsStore } from '@store/transactions-store';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useShallow } from 'zustand/shallow';
+
+import type { PaginationParams } from '@/shared/types/common';
 
 export const useTransactionMethods = () => {
   const { addTransaction, deleteTransaction } = useTransactionsStore(
@@ -22,7 +23,7 @@ export const useTransactionMethods = () => {
  * Hook for working with transactions
  * Automatically loads data when component mounts and app returns to foreground
  */
-export function useTransactions(limit?: number) {
+export function useTransactions(params: PaginationParams) {
   const { addTransaction, deleteTransaction } = useTransactionMethods();
   const { transactions, isLoading, error, loadTransactions } = useTransactionsStore(
     useShallow((state) => ({
@@ -34,36 +35,18 @@ export function useTransactions(limit?: number) {
   );
 
   useAppStateActive(() => {
-    loadTransactions();
+    loadTransactions(params);
   });
 
   useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
-
-  // Separate transactions by type
-  const { incomeTransactions, expenseTransactions } = useMemo(() => {
-    const income = transactions.filter((txn) => txn.type === 'income');
-    const expense = transactions.filter((txn) => txn.type === 'expense');
-
-    return {
-      incomeTransactions: income,
-      expenseTransactions: expense,
-    };
-  }, [transactions]);
-
-  const limitedTransactions = useMemo(
-    () => (limit ? transactions.slice(0, limit) : transactions),
-    [transactions, limit],
-  );
+    loadTransactions(params);
+  }, [loadTransactions, params]);
 
   return {
-    transactions: limitedTransactions,
-    incomeTransactions,
-    expenseTransactions,
+    transactions,
     isLoading,
     error,
-    refresh: loadTransactions,
+    refresh: () => loadTransactions(params),
     addTransaction,
     deleteTransaction,
   };
@@ -72,7 +55,7 @@ export function useTransactions(limit?: number) {
 /**
  * Hook for recent transactions
  */
-export function useRecentTransactions(limit: number = 20) {
+export function useRecentTransactions(limit: number) {
   const { transactions, isLoading, error, loadTransactions } = useTransactionsStore(
     useShallow((state) => ({
       transactions: state.transactions,
@@ -83,54 +66,17 @@ export function useRecentTransactions(limit: number = 20) {
   );
 
   useAppStateActive(() => {
-    loadTransactions();
+    loadTransactions({ page: 1, limit });
   });
 
   useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
+    loadTransactions({ page: 1, limit });
+  }, [loadTransactions, limit]);
 
   return {
-    transactions: transactions.slice(0, limit),
+    transactions,
     isLoading,
     error,
-    refresh: () => loadTransactions(),
-  };
-}
-
-/**
- * Hook for transactions by account
- */
-export function useTransactionsByAccount(accountId: number): {
-  transactions: TransactionWithDetails[];
-  isLoading: boolean;
-  error: string | null;
-} {
-  const { transactions, isLoading, error, loadTransactions } = useTransactionsStore(
-    useShallow((state) => ({
-      transactions: state.transactions,
-      isLoading: state.isLoading,
-      error: state.error,
-      loadTransactions: state.loadTransactions,
-    })),
-  );
-
-  useAppStateActive(() => {
-    loadTransactions();
-  });
-
-  useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
-
-  const accountTransactions = useMemo(
-    () => transactions.filter((txn) => txn.accountId === accountId),
-    [transactions, accountId],
-  );
-
-  return {
-    transactions: accountTransactions,
-    isLoading,
-    error,
+    refresh: () => loadTransactions({ page: 1, limit }),
   };
 }

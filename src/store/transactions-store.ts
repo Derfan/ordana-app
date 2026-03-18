@@ -1,5 +1,6 @@
 import type { NewTransaction, TransactionWithDetails } from '@db/repositories';
 import { transactionService } from '@features/transactions/services/transaction.service';
+import type { PaginationParams } from '@shared/types/common';
 import { create } from 'zustand';
 
 import { useAccountsStore } from './accounts-store';
@@ -12,7 +13,7 @@ interface TransactionsState {
   lastUpdatedAt: number;
 
   // Actions
-  loadTransactions: () => Promise<void>;
+  loadTransactions: (params: PaginationParams) => Promise<void>;
   addTransaction: (data: NewTransaction) => Promise<void>;
   updateTransaction: (id: number, data: Partial<NewTransaction>) => Promise<void>;
   deleteTransaction: (id: number) => Promise<void>;
@@ -38,13 +39,12 @@ export const useTransactionsStore = create<TransactionsState>((set, get) => ({
   error: null,
   lastUpdatedAt: 0,
 
-  loadTransactions: async () => {
+  loadTransactions: async (params) => {
     set({ isLoading: true, error: null });
     try {
-      // Always load all transactions for the store
-      const transactions = await transactionService.getAllTransactions();
+      const { items } = await transactionService.getTransactionsPaginated(params);
 
-      set({ transactions, isLoading: false });
+      set({ transactions: items, isLoading: false });
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Unknown error',

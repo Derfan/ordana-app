@@ -6,6 +6,7 @@ import {
   transactionRepository,
   type TransactionWithDetails,
 } from '@db/repositories';
+import type { PaginatedResult, PaginationParams } from '@shared/types/common';
 
 /**
  * Service Layer for transaction management
@@ -20,6 +21,30 @@ export class TransactionService {
       return await transactionRepository.getAll();
     } catch (error) {
       console.error('[TransactionService] Error getting transactions:', error);
+      throw new Error('Failed to load transactions');
+    }
+  }
+
+  /**
+   * Get transactions with offset-based pagination
+   */
+  async getTransactionsPaginated(
+    params: PaginationParams,
+  ): Promise<PaginatedResult<TransactionWithDetails>> {
+    try {
+      const { page, limit } = params;
+      const offset = (page - 1) * limit;
+
+      const { items, total } = await transactionRepository.getPaginated(limit, offset);
+
+      return {
+        items,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      };
+    } catch (error) {
+      console.error('[TransactionService] Error getting paginated transactions:', error);
       throw new Error('Failed to load transactions');
     }
   }

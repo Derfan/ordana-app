@@ -1,14 +1,17 @@
-import { useTransactions } from '@hooks/use-transactions';
+import { useTransactionMethods } from '@hooks/use-transactions';
+import { LegendList } from '@legendapp/list';
 import { Box, Button, createThemedStyles, Text } from '@shared/design-system';
 import { useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, RefreshControl, StyleSheet } from 'react-native';
+import { ActivityIndicator, Alert, RefreshControl, StyleSheet } from 'react-native';
 
+import { useInfiniteTransactions } from '../hooks/useInfiniteTransactions';
 import { AddTransactionModal } from './add-transaction-modal';
 import { TransactionCard } from './transaction-card';
 
 export function TransactionsList() {
-  const { transactions, isLoading, error, refresh, addTransaction, deleteTransaction } =
-    useTransactions(50);
+  const { data, isLoading, refresh, onEndReached, onEndReachedThreshold } =
+    useInfiniteTransactions();
+  const { addTransaction, deleteTransaction } = useTransactionMethods();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -42,16 +45,7 @@ export function TransactionsList() {
     ]);
   };
 
-  if (error && transactions.length === 0) {
-    return (
-      <Box gap="lg" flex={1} justify="center" align="center">
-        <Text style={styles.errorText}>❌ {error}</Text>
-        <Button variant="primary" size="md" label="Retry" onPress={refresh} />
-      </Box>
-    );
-  }
-
-  if (isLoading && transactions.length === 0) {
+  if (isLoading && data.length === 0) {
     return (
       <Box gap="sm" flex={1} justify="center" align="center">
         <ActivityIndicator size="large" />
@@ -62,8 +56,8 @@ export function TransactionsList() {
 
   return (
     <>
-      <FlatList
-        data={transactions}
+      <LegendList
+        data={data}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <TransactionCard
@@ -88,7 +82,17 @@ export function TransactionsList() {
             />
           </Box>
         }
+        ListFooterComponent={
+          isLoading && data.length > 0 ? (
+            <Box paddingY="md" align="center">
+              <ActivityIndicator size="small" />
+            </Box>
+          ) : null
+        }
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={onEndReachedThreshold}
+        recycleItems
       />
 
       <AddTransactionModal

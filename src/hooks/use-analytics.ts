@@ -1,5 +1,5 @@
-import type { AnalyticsData, MonthAnalytics } from '@features/analytics';
-import { analyticsService } from '@features/analytics';
+import type { AnalyticsData, MonthAnalytics } from '@features/analytics/services/analytics.service';
+import { analyticsService } from '@features/analytics/services/analytics.service';
 import { useAppStateActive } from '@hooks/use-app-state';
 import { useTransactionsStore } from '@store/transactions-store';
 import { useCallback, useEffect, useState } from 'react';

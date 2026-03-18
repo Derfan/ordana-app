@@ -1,5 +1,5 @@
 import { accounts, categories, db, transactions } from '@db/client';
-import { and, desc, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, count as drizzleCount, desc, eq, gte, lte, sql } from 'drizzle-orm';
 
 export type Transaction = typeof transactions.$inferSelect;
 export type NewTransaction = typeof transactions.$inferInsert;
@@ -57,6 +57,48 @@ export class TransactionRepository {
       .orderBy(desc(transactions.date), desc(transactions.id));
 
     return result as TransactionWithDetails[];
+  }
+
+  async getPaginated(
+    limit: number,
+    offset: number,
+  ): Promise<{ items: TransactionWithDetails[]; total: number }> {
+    const [items, totalResult] = await Promise.all([
+      db
+        .select({
+          id: transactions.id,
+          type: transactions.type,
+          amount: transactions.amount,
+          accountId: transactions.accountId,
+          categoryId: transactions.categoryId,
+          description: transactions.description,
+          date: transactions.date,
+          createdAt: transactions.createdAt,
+          updatedAt: transactions.updatedAt,
+          account: {
+            id: accounts.id,
+            name: accounts.name,
+          },
+          category: {
+            id: categories.id,
+            name: categories.name,
+            icon: categories.icon,
+            color: categories.color,
+          },
+        })
+        .from(transactions)
+        .leftJoin(accounts, eq(transactions.accountId, accounts.id))
+        .leftJoin(categories, eq(transactions.categoryId, categories.id))
+        .orderBy(desc(transactions.date), desc(transactions.id))
+        .limit(limit)
+        .offset(offset),
+      db.select({ count: drizzleCount() }).from(transactions),
+    ]);
+
+    return {
+      items: items as TransactionWithDetails[],
+      total: totalResult[0]?.count ?? 0,
+    };
   }
 
   async getRecent(limit: number = 20): Promise<TransactionWithDetails[]> {
