@@ -1,4 +1,4 @@
-import { TransactionsList } from '@features/transactions';
+import { TransactionSearchInput, TransactionsList } from '@features/transactions';
 import { createThemedStyles, Text } from '@shared/design-system';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,6 +10,8 @@ export default function HistoryScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
         <Text variant="heading1">History</Text>
+
+        <TransactionSearchInput />
       </View>
 
       <View style={styles.content}>
@@ -27,11 +29,12 @@ const useStyles = createThemedStyles((theme) =>
     header: {
       marginVertical: theme.spacing[1],
       paddingHorizontal: theme.spacing[2],
+      rowGap: theme.spacing[2],
     },
     content: {
       flexGrow: 1,
       paddingHorizontal: theme.spacing[2],
-      paddingVertical: theme.spacing[4],
+      paddingVertical: theme.spacing[2],
     },
   }),
 );

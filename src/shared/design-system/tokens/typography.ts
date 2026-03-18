@@ -79,7 +79,7 @@ export const typographyVariants = {
   // --- Body ---
   body: {
     fontSize: scale.fontSize.base, // 16 — replaces ThemedText type="default"
-    lineHeight: scale.lineHeight.relaxed,
+    lineHeight: scale.lineHeight.snug,
     fontWeight: scale.fontWeight.regular,
   },
   bodyMedium: {
