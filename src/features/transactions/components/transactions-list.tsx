@@ -1,5 +1,5 @@
 import { useTransactions } from '@hooks/use-transactions';
-import { Button, createThemedStyles, Text, View } from '@shared/design-system';
+import { Box, Button, createThemedStyles, Text } from '@shared/design-system';
 import { useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, RefreshControl, StyleSheet } from 'react-native';
 
@@ -44,19 +44,19 @@ export function TransactionsList() {
 
   if (error && transactions.length === 0) {
     return (
-      <View surface="page" style={styles.centerContainer}>
+      <Box gap="lg" flex={1} justify="center" align="center">
         <Text style={styles.errorText}>❌ {error}</Text>
-        <Button variant="primary" size="md" label="Retry" onPress={() => refresh()} />
-      </View>
+        <Button variant="primary" size="md" label="Retry" onPress={refresh} />
+      </Box>
     );
   }
 
   if (isLoading && transactions.length === 0) {
     return (
-      <View surface="page" style={styles.centerContainer}>
+      <Box gap="sm" flex={1} justify="center" align="center">
         <ActivityIndicator size="large" />
-        <Text style={styles.loadingText}>Loading transactions...</Text>
-      </View>
+        <Text color="muted">Loading transactions</Text>
+      </Box>
     );
   }
 
@@ -74,10 +74,10 @@ export function TransactionsList() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View colorValue="transparent" style={styles.emptyContainer}>
+          <Box paddingY="2xl" align="center" gap="sm">
             <Text style={styles.emptyIcon}>💸</Text>
             <Text variant="heading3">No Transactions</Text>
-            <Text style={styles.emptyText}>
+            <Text color="muted" align="center">
               Start tracking your finances by adding your first transaction
             </Text>
             <Button
@@ -86,7 +86,7 @@ export function TransactionsList() {
               label="Add Transaction"
               onPress={() => setIsModalVisible(true)}
             />
-          </View>
+          </Box>
         }
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />}
       />
@@ -102,42 +102,15 @@ export function TransactionsList() {
 
 const useStyles = createThemedStyles((theme) =>
   StyleSheet.create({
-    centerContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: theme.spacing[5],
-      gap: theme.spacing[4],
-    },
-    loadingText: {
-      ...theme.typography.bodySmall,
-      color: theme.colors.fg.muted,
-      marginTop: theme.spacing[3],
-    },
     errorText: {
-      ...theme.typography.body,
       color: theme.colors.fg.danger,
-      textAlign: 'center',
-    },
-    emptyContainer: {
-      alignItems: 'center',
-      paddingVertical: theme.spacing[16],
-      gap: theme.spacing[2],
     },
     emptyIcon: {
       fontSize: 80,
       lineHeight: 96,
-      marginBottom: theme.spacing[2],
-    },
-    emptyText: {
-      ...theme.typography.bodySmall,
-      color: theme.colors.fg.muted,
-      textAlign: 'center',
-      marginBottom: theme.spacing[4],
-      paddingHorizontal: theme.spacing[10],
     },
     listContent: {
-      rowGap: theme.spacing[3],
+      rowGap: theme.spacing[2],
     },
   }),
 );

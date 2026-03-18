@@ -29,7 +29,7 @@ const useStyles = createThemedStyles((theme) =>
       paddingHorizontal: theme.spacing[2],
     },
     content: {
-      rowGap: theme.spacing[4],
+      flexGrow: 1,
       paddingHorizontal: theme.spacing[2],
       paddingVertical: theme.spacing[4],
     },

@@ -21,6 +21,12 @@ export interface DSTextProps extends Omit<TextProps, 'style'> {
   color?: TextColorKey;
 
   /**
+   * Text alignment.
+   * @default 'left'
+   */
+  align?: 'center' | 'left' | 'right';
+
+  /**
    * Escape hatch for one-off color overrides (e.g. dynamic category colors from the DB).
    * When provided, takes precedence over `color`.
    */

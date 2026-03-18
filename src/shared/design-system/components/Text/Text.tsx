@@ -6,6 +6,7 @@ import type { DSTextProps } from './Text.types';
 export function Text({
   variant = 'body',
   color = 'default',
+  align = 'left',
   colorValue,
   style,
   ...rest
@@ -15,5 +16,10 @@ export function Text({
   const resolvedColor = colorValue ?? theme.colors.fg[color];
   const typographyStyle = theme.typography[variant];
 
-  return <RNText style={[typographyStyle, { color: resolvedColor }, style]} {...rest} />;
+  return (
+    <RNText
+      style={[typographyStyle, { color: resolvedColor, textAlign: align }, style]}
+      {...rest}
+    />
+  );
 }
